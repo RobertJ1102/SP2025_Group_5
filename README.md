@@ -11,8 +11,8 @@ Name your repository using the following format:
 - **&lt;Eric Liu&gt;**: &lt;e.m.liu@wustl.edu&gt; ; &lt;EricWashu&gt;
 
 ## TA
+&lt;Asher&gt;
 
-&lt;Name of your group's TA&gt;
 
 ## Objectives
 

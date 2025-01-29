@@ -23,3 +23,7 @@ app.add_middleware(
 @app.get("/", tags=["root"])
 async def read_root() -> dict:
     return {"message": "Hello World"}
+
+@app.get("/test")
+async def get_test():
+    return {"message": "Hello World:8000"}

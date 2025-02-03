@@ -1,3 +1,4 @@
+""" FastAPI app """
 import uvicorn
 
 

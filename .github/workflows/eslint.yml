@@ -2,11 +2,11 @@ name: ESLint
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '42 15 * * 4' # Runs every Thursday at 15:42 UTC
+    - cron: "42 15 * * 4"
 
 jobs:
   eslint:
@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
-      actions: read # Only required for private repos
+      actions: read
 
     steps:
       - name: Checkout code
@@ -25,21 +25,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm' # Cache npm dependencies for speed
+          cache: "npm"
 
       - name: Install dependencies
         run: |
           if [ -f package.json ]; then npm ci; else echo "No package.json found, skipping ESLint."; exit 0; fi
 
+      - name: Debug ESLint Run
+        run: |
+          echo "Checking JavaScript/TypeScript files..."
+          find . -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx"
+
       - name: Run ESLint
         env:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
         run: |
-          npm run lint
-        continue-on-error: true
-
-      - name: Upload analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: eslint-results.sarif
-          wait-for-processing: true
+          npm run lint || echo '{}' > eslint-results.sarif

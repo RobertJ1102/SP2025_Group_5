@@ -21,13 +21,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check for ESLint config
-        run: |
-          if [ ! -f .eslintrc.js ]; then 
-            echo "❌ ESLint config file missing. Skipping linting."; 
-            exit 1; 
-          fi
-
       - name: Install Dependencies
         run: |
           if [ -f package.json ]; then npm ci; else echo "❌ No package.json found. Skipping ESLint."; exit 1; fi

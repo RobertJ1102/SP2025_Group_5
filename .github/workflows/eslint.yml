@@ -30,6 +30,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install Dependencies
+        run: |
+          if [ -f frontend/package.json ]; then
+            cd frontend
+            npm ci --legacy-peer-deps
+            npm install --save-dev eslint-config-react-app eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y --legacy-peer-deps
+          else 
+            echo "❌ No frontend package.json found. Skipping ESLint."; exit 1; 
+          fi
+
       - name: Install ESLint
         run: |
           npm install eslint@8.10.0

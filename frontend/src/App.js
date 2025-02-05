@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { getCurrentUser, logout } from "./services/auth";
 import LoginPage from "./components/LoginPage";
 import CreateAccountPage from "./components/CreateAccountPage";
+import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import HomePage from "./components/HomePage";
 import { Button, Container, Typography } from "@mui/material";
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<CreateAccountPage />} />
           <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Routes>
       )}
     </Container>

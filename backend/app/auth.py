@@ -1,13 +1,16 @@
 """ Authentication routes for the FastAPI application """
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+import random
+import string
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
+from fastapi_mail import FastMail, MessageSchema, MessageType
 from passlib.context import CryptContext
 from itsdangerous import URLSafeTimedSerializer, BadData, SignatureExpired
 from sqlalchemy.orm import Session
+from .config import conf
 from .config import SECRET_KEY
 from .models import User
 from .schemas import UserLogin, UserCreate
 from .database import get_db
-
 
 router = APIRouter()
 
@@ -93,3 +96,43 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"email": user.email}
+
+# Generate a random password
+def generate_random_password(length=12):
+    """Generate a random password with letters, digits, and special characters."""
+    characters = string.ascii_letters + string.digits + "!@#$%^&*()"
+    return ''.join(random.choice(characters) for i in range(length))
+
+# Function to send email
+async def send_reset_email(email: str, new_password: str):
+    """Send password reset email"""
+    message = MessageSchema(
+        subject="Password Reset Request",
+        recipients=[email],
+        body=f"Hello,\n\nYour new password is: {new_password}\n\nPlease log in and change it immediately.",
+        subtype=MessageType.plain
+    )
+    
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
+
+
+# Route to handle password reset
+@router.post("/reset-password")
+async def reset_password(email: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """Reset user password and send new password via email."""
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Email not found")
+
+    # Generate and hash new password
+    new_password = generate_random_password()
+    hashed_password = pwd_context.hash(new_password)
+    user.password = hashed_password
+    db.commit()
+
+    # Send reset email as a background task
+    background_tasks.add_task(send_reset_email, email, new_password)
+
+    return {"message": "A new password has been sent to your email."}

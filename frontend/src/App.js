@@ -1,20 +1,52 @@
 import React, { useEffect, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { getCurrentUser, logout } from "./services/auth";
+import LoginPage from "./components/LoginPage";
+import HomePage from "./components/HomePage";
+import { Button, Container, Typography } from "@mui/material";
 
 function App() {
-  const [data, setData] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/test")
-      .then((response) => response.json())
-      .then((data) => setData(data.message))
-      .catch((error) => console.error("Error fetching data:", error));
+    async function fetchUser() {
+      const userData = await getCurrentUser();
+      setUser(userData);
+      setLoading(false);
+    }
+    fetchUser();
   }, []);
 
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+  };
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
   return (
-    <div>
-      <h1>FastAPI + React</h1>
-      <p>Message from FastAPI: {data}</p>
-    </div>
+    <Container>
+      {user ? (
+        <>
+          <Typography variant="h5">Welcome, {user.username}!</Typography>
+          <Button variant="contained" color="secondary" onClick={handleLogout} sx={{ mt: 2 }}>
+            Logout
+          </Button>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </>
+      ) : (
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      )}
+    </Container>
   );
 }
 

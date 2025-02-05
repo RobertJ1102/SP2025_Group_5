@@ -64,7 +64,6 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
     """ Login with email and password """
     print(f"Received login data: {user}")
     db_user = db.query(User).filter(User.email == user.email).first()
-    
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
@@ -90,10 +89,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     email = verify_session(session_token)
     if not email:
         raise HTTPException(status_code=401, detail="Invalid session")
-    
     user = db.query(User).filter(User.email == email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
     return {"email": user.email}
-

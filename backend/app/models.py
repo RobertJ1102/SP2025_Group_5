@@ -2,6 +2,7 @@
 from sqlalchemy import Column, Integer, String
 from .database import Base
 
+# pylint: disable=too-few-public-methods
 class User(Base):
     """User model"""
     __tablename__ = "users"

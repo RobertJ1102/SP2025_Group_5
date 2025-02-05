@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  # MySQL Database Service
+  db:
+    image: mysql:8
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: farefinder_db
+      MYSQL_USER: farefinder_user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - farefinder-network
+
+  # FastAPI Backend Service
+  backend:
+    build: ./backend
+    container_name: backend_container
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "mysql+pymysql://farefinder_user:password@db:3306/farefinder_db"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    networks:
+      - farefinder-network
+
+  # React Frontend Service
+  frontend:
+    build: ./frontend
+    container_name: frontend_container
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      REACT_APP_API_URL: "http://localhost:8000"
+    command: ["npm", "start"]
+    networks:
+      - farefinder-network
+
+# Persistent Storage for MySQL
+volumes:
+  db-data:
+
+# Custom Docker Network (Avoids Conflicts)
+networks:
+  farefinder-network:
+    driver: bridge

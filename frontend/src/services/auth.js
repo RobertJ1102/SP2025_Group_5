@@ -22,11 +22,20 @@ export const logout = async () => {
   });
 };
 
-export const getCurrentUser = async () => {
-  const response = await fetch(`${API_URL}/auth/me`, {
-    credentials: "include",
-  });
+export async function getCurrentUser() {
+  try {
+    const response = await fetch("http://localhost:8000/auth/me", {
+      method: "GET",
+      credentials: "include", // Important to send session cookies
+    });
 
-  if (!response.ok) return null;
-  return response.json();
-};
+    if (!response.ok) {
+      return null; // Not authenticated
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    return null;
+  }
+}

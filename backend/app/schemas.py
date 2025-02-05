@@ -5,3 +5,8 @@ class UserLogin(BaseModel):
     """UserLogin model"""
     email: EmailStr
     password: str
+
+class UserCreate(UserLogin):
+    """UserCreate model"""
+    email: EmailStr
+    password: str

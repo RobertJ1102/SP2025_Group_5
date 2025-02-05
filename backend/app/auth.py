@@ -5,7 +5,7 @@ from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy.orm import Session
 from .config import SECRET_KEY
 from .models import User
-from .schemas import UserLogin
+from .schemas import UserLogin, UserCreate
 from .database import get_db
 
 
@@ -18,6 +18,24 @@ serializer = URLSafeTimedSerializer(SECRET_KEY)
 def hash_password(password: str):
     """ Hash the password """
     return pwd_context.hash(password)
+
+@router.post("/register")
+def register(user: UserCreate, response: Response, db: Session = Depends(get_db)):
+    """Registers a new user."""
+    # Check if user exists
+    existing_user = db.query(User).filter(User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Create new user
+    new_user = User(email=user.email, password=hash_password(user.password))
+    db.add(new_user)
+    db.commit()
+    session_token = create_session(new_user.email)
+    response.set_cookie(key="session", value=session_token, httponly=True)
+
+    return {"message": "User registered successfully"}
+
 
 # Verify password
 def verify_password(plain_password, hashed_password):
@@ -40,6 +58,7 @@ def verify_session(token: str):
 @router.post("/login")
 def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
     """ Login with email and password """
+    print(f"Received login data: {user}")
     db_user = db.query(User).filter(User.email == user.email).first()
     
     if not db_user or not verify_password(user.password, db_user.password):
@@ -59,14 +78,18 @@ def logout(response: Response):
 # Get Current User (Protected)
 @router.get("/me")
 def get_current_user(request: Request, db: Session = Depends(get_db)):
-    """ Get the current user """
+    """ Get the current logged-in user """
     session_token = request.cookies.get("session")
     if not session_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    username = verify_session(session_token)
-    if not username:
+    email = verify_session(session_token)
+    if not email:
         raise HTTPException(status_code=401, detail="Invalid session")
     
-    user = db.query(User).filter(User.username == username).first()
-    return {"username": user.username, "email": user.email}
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"email": user.email}
+

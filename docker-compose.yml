@@ -9,6 +9,7 @@ services:
       MYSQL_DATABASE: farefinder_db
       MYSQL_USER: farefinder_user
       MYSQL_PASSWORD: password
+      MYSQL_AUTH_PLUGIN: mysql_native_password
     ports:
       - "3306:3306"
     volumes:
@@ -47,6 +48,8 @@ services:
       - /app/node_modules
     environment:
       REACT_APP_API_URL: "http://localhost:8000"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
     command: ["npm", "start"]
     networks:
       - farefinder-network

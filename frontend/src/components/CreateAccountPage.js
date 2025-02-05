@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-function LoginPage() {
+function CreateAccountPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -14,27 +15,29 @@ function LoginPage() {
     setError("");
     setSuccess(false);
 
-    if (!email || !password) {
-      setError("Please enter both email and password.");
+    // ✅ Basic validation
+    if (!email || !password || !confirmPassword) {
+      setError("All fields are required.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/login", {
+      const response = await fetch("http://localhost:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => navigate("/"), 1000); // Redirect to home after login
+        setTimeout(() => navigate("/"), 1000); // Redirect to home after account creation
       } else {
-        const errorDetail = data.detail || "Login failed";
-        setError(typeof errorDetail === "string" ? errorDetail : JSON.stringify(errorDetail));
+        setError(data.detail || "Registration failed.");
       }
     } catch (err) {
       setError("Failed to connect to the server.");
@@ -45,10 +48,10 @@ function LoginPage() {
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, textAlign: "center" }}>
         <Typography variant="h4" gutterBottom>
-          Login
+          Create Account
         </Typography>
         {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">Login successful!</Alert>}
+        {success && <Alert severity="success">Account created! You can now log in.</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Email"
@@ -68,18 +71,22 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <TextField
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            margin="normal"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
           <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-            Login
+            Register
           </Button>
         </form>
-      </Box>
-      <Box sx={{ mt: 2, textAlign: "center" }}>
-        <Button variant="outlined" color="secondary" fullWidth onClick={() => (window.location.href = "/register")}>
-          Create an Account
-        </Button>
       </Box>
     </Container>
   );
 }
 
-export default LoginPage;
+export default CreateAccountPage;

@@ -1,19 +1,30 @@
-"""Importing the necessary libraries and creating the database connection"""
+"""Database Configuration for FastAPI App"""
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = os.getenv("DATABASE_URL",
-        "mysql+pymysql://farefinder_user:password@db:3306/farefinder_db")
+# Load environment variable or fallback to default MySQL connection
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "mysql+pymysql://farefinder_user:password@db:3306/farefinder_db"
+)
 
-engine = create_engine(DATABASE_URL)
+# ✅ Create the SQLAlchemy engine
+engine = create_engine(DATABASE_URL, echo=True)
+
+# ✅ Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# ✅ Define base for ORM models
 Base = declarative_base()
 
-"""Function to get the database connection"""
+# ✅ Function to initialize the database and create tables
+def init_db():
+    from app.models import User  # Import models here to avoid circular imports
+    Base.metadata.create_all(bind=engine)
+
+# ✅ Function to get the database session
 def get_db():
-    """Get the database connection"""
+    """Provides a database session for request lifecycle."""
     db = SessionLocal()
     try:
         yield db

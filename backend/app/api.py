@@ -1,3 +1,4 @@
+""" Main API router """
 from fastapi import APIRouter
 from app.auth import router as auth_router
 

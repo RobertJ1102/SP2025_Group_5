@@ -8,21 +8,21 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL", "mysql+pymysql://farefinder_user:password@db:3306/farefinder_db"
 )
 
-# ✅ Create the SQLAlchemy engine
+# Create the SQLAlchemy engine
 engine = create_engine(DATABASE_URL, echo=True)
 
-# ✅ Create session factory
+# Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# ✅ Define base for ORM models
+# Define base for ORM models
 Base = declarative_base()
 
-# ✅ Function to initialize the database and create tables
+# Function to initialize the database and create tables
 def init_db():
-    from app.models import User  # Import models here to avoid circular imports
+    """Initialize the database and create tables."""
     Base.metadata.create_all(bind=engine)
 
-# ✅ Function to get the database session
+# Function to get the database session
 def get_db():
     """Provides a database session for request lifecycle."""
     db = SessionLocal()

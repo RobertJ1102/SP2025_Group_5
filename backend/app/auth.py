@@ -1,7 +1,7 @@
 """ Authentication routes for the FastAPI application """
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from passlib.context import CryptContext
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, BadData, SignatureExpired
 from sqlalchemy.orm import Session
 from .config import SECRET_KEY
 from .models import User
@@ -52,7 +52,11 @@ def verify_session(token: str):
     """ Verify the session token """
     try:
         return serializer.loads(token, salt="session", max_age=3600)  # Session expires in 1 hour
-    except Exception:
+    except SignatureExpired:
+        # Handle expired session
+        return None
+    except BadData:
+        # Handle invalid or tampered session
         return None
 
 @router.post("/login")

@@ -54,6 +54,7 @@ def create_session(username: str):
 def verify_session(token: str):
     """ Verify the session token """
     try:
+        print("Verifying session....")
         return serializer.loads(token, salt="session", max_age=3600)  # Session expires in 1 hour
     except SignatureExpired:
         # Handle expired session
@@ -71,7 +72,14 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
     session_token = create_session(db_user.email)
-    response.set_cookie(key="session", value=session_token, httponly=True)
+    response.set_cookie(
+        key="session",
+        value=session_token,
+        httponly=True,   # Prevents JS from accessing the cookie
+        secure=False,
+        samesite="Lax",  # Prevents CSRF while allowing login persistence
+        max_age=3600,    # 1 hour session
+    )
     return {"message": "Login successful"}
 
 # Logout Route (Clear Cookie)

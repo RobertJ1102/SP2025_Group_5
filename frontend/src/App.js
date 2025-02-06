@@ -16,6 +16,10 @@ function App() {
       const userData = await getCurrentUser();
       setUser(userData);
       setLoading(false);
+
+      if (userData) {
+        Navigate("/"); // Redirect to homepage on login success
+      }
     }
     fetchUser();
   }, []);

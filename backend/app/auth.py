@@ -75,10 +75,11 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
     response.set_cookie(
         key="session",
         value=session_token,
-        httponly=True,   # Prevents JS from accessing the cookie
-        secure=False,
-        samesite="Lax",  # Prevents CSRF while allowing login persistence
+        httponly=True,   # Prevents JS access
+        secure=False,    # Set to True if using HTTPS
+        samesite="None",  # Prevents CSRF while allowing login persistence
         max_age=3600,    # 1 hour session
+        path="/",
     )
     return {"message": "Login successful"}
 
@@ -117,18 +118,17 @@ async def send_reset_email(email: str, new_password: str):
     message = MessageSchema(
         subject="Password Reset Request",
         recipients=[email],
-        body=f"Hello,\n\nYour new password is: {new_password}\n\nPlease log in and change it immediately.",
+        body=f"Hello,\n\nYour new password is: {new_password}\n\nPlease log in and change it.",
         subtype=MessageType.plain
     )
-    
     fm = FastMail(conf)
     await fm.send_message(message)
 
 
-
 # Route to handle password reset
 @router.post("/reset-password")
-async def reset_password(email: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+async def reset_password(email: str, background_tasks: BackgroundTasks, 
+                                    db: Session = Depends(get_db)):
     """Reset user password and send new password via email."""
     user = db.query(User).filter(User.email == email).first()
     if not user:

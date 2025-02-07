@@ -128,7 +128,7 @@ async def send_reset_email(email: str, new_password: str):
 
 # Route to handle password reset
 @router.post("/reset-password")
-async def reset_password(email: str, background_tasks: BackgroundTasks, 
+async def reset_password(email: str, background_tasks: BackgroundTasks,
                                     db: Session = Depends(get_db)):
     """Reset user password and send new password via email."""
     user = db.query(User).filter(User.email == email).first()

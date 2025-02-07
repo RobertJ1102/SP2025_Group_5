@@ -31,7 +31,7 @@ function LoginPage() {
 
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => navigate("/"), 1000); // Redirect to home after login
+        setTimeout(() => (window.location.href = "/"), 1000);
       } else {
         const errorDetail = data.detail || "Login failed";
         setError(typeof errorDetail === "string" ? errorDetail : JSON.stringify(errorDetail));

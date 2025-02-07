@@ -75,10 +75,10 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
     response.set_cookie(
         key="session",
         value=session_token,
-        httponly=True,   # Prevents JS access
-        secure=False,    # Set to True if using HTTPS
-        samesite="None",  # Prevents CSRF while allowing login persistence
-        max_age=3600,    # 1 hour session
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=3600,
         path="/",
     )
     return {"message": "Login successful"}
@@ -88,6 +88,7 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
 def logout(response: Response):
     """ Logout the user """
     response.delete_cookie("session")
+    response.set_cookie("session", "", expires=0, httponly=True)
     return {"message": "Logged out"}
 
 # Get Current User (Protected)

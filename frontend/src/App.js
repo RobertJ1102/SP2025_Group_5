@@ -29,6 +29,12 @@ function App() {
     return <Typography>Loading...</Typography>;
   }
 
+  if (window.location.hostname === "localhost") {
+    window.location.replace(
+      `http://127.0.0.1:${window.location.port}${window.location.pathname}${window.location.search}`
+    );
+  }
+
   return (
     <Container>
       {user ? (

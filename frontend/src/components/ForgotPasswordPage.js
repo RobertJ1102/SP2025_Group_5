@@ -19,6 +19,7 @@ function ForgotPasswordPage() {
       });
 
       const data = await response.json();
+
       if (response.ok) {
         setMessage("A new password has been sent to your email.");
       } else {

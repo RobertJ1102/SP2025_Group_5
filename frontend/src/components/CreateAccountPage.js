@@ -13,7 +13,6 @@ function CreateAccountPage() {
     setError("");
     setSuccess(false);
 
-    // ✅ Basic validation
     if (!email || !password || !confirmPassword) {
       setError("All fields are required.");
       return;

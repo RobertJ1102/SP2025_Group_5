@@ -5,6 +5,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request,
 from fastapi_mail import FastMail, MessageSchema, MessageType
 from passlib.context import CryptContext
 from itsdangerous import URLSafeTimedSerializer, BadData, SignatureExpired
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from .config import conf
 from .config import SECRET_KEY
@@ -88,7 +89,6 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
 def logout(response: Response):
     """ Logout the user """
     response.delete_cookie("session")
-    response.set_cookie("session", "", expires=0, httponly=True)
     return {"message": "Logged out"}
 
 # Get Current User (Protected)
@@ -125,13 +125,19 @@ async def send_reset_email(email: str, new_password: str):
     fm = FastMail(conf)
     await fm.send_message(message)
 
+class PasswordResetRequest(BaseModel):
+    """Request body for password reset"""
+    email: EmailStr
 
 # Route to handle password reset
 @router.post("/reset-password")
-async def reset_password(email: str, background_tasks: BackgroundTasks,
-                                    db: Session = Depends(get_db)):
+async def reset_password(
+    request: PasswordResetRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     """Reset user password and send new password via email."""
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.email == request.email).first()
     if not user:
         raise HTTPException(status_code=404, detail="Email not found")
 
@@ -141,7 +147,10 @@ async def reset_password(email: str, background_tasks: BackgroundTasks,
     user.password = hashed_password
     db.commit()
 
-    # Send reset email as a background task
-    background_tasks.add_task(send_reset_email, email, new_password)
-
-    return {"message": "A new password has been sent to your email."}
+    try:
+        # Send reset email as a background task
+        background_tasks.add_task(send_reset_email, request.email, new_password)
+        return {"message": "A new password has been sent to your email."}
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send reset email.") from e

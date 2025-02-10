@@ -6,6 +6,7 @@ import CreateAccountPage from "./components/CreateAccountPage";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import HomePage from "./components/HomePage";
 import { Button, Container, Typography } from "@mui/material";
+import ChangePasswordPage from "./components/ChangePasswordPage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -46,6 +47,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
           </Routes>
         </>
       ) : (

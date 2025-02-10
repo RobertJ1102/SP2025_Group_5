@@ -154,3 +154,25 @@ async def reset_password(
     except Exception as e:
         print(f"Error sending email: {e}")
         raise HTTPException(status_code=500, detail="Failed to send reset email.") from e
+    
+class PasswordChangeRequest(BaseModel):
+    """Request body for changing password"""
+    email: EmailStr
+    old_password: str
+    new_password: str
+
+# Route to handle user changing password
+@router.post("/change-password")
+async def change_password(
+    request: PasswordChangeRequest,
+    db: Session = Depends(get_db)):
+    """Change user password"""
+    # confirm user exists in db, then change password to a new password
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Email not found")
+    if not verify_password(request.old_password, user.password):
+        raise HTTPException(status_code=400, detail="Invalid password")
+    user.password = hash_password(request.new_password)
+    db.commit()
+    return {"message": "Password changed successfully"}

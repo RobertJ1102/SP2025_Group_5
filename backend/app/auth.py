@@ -154,8 +154,7 @@ async def reset_password(
     except Exception as e:
         print(f"Error sending email: {e}")
         raise HTTPException(status_code=500, detail="Failed to send reset email.") from e
-    
-    
+
 class PasswordChangeRequest(BaseModel):
     """Request body for changing password"""
     email: EmailStr

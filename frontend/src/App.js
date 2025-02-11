@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import MapComponent from "./components/MapComponent";
 
 function App() {
   const [data, setData] = useState("");
@@ -26,6 +27,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/map" element={<MapComponent />} />
           <Route path="/" element={<Login />} /> {/* Default to login */}
         </Routes>
       </div>

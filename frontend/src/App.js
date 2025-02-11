@@ -1,36 +1,65 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import MapComponent from "./components/MapComponent";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { getCurrentUser, logout } from "./services/auth";
+import LoginPage from "./components/LoginPage";
+import CreateAccountPage from "./components/CreateAccountPage";
+import ForgotPasswordPage from "./components/ForgotPasswordPage";
+import HomePage from "./components/HomePage";
+import { Button, Container, Typography } from "@mui/material";
+import ChangePasswordPage from "./components/ChangePasswordPage";
+
 
 function App() {
-  const [data, setData] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/test")
-      .then((response) => response.json())
-      .then((data) => setData(data.message))
-      .catch((error) => console.error("Error fetching data:", error));
+    async function fetchUser() {
+      const userData = await getCurrentUser();
+      setUser(userData);
+      setLoading(false);
+    }
+    fetchUser();
   }, []);
 
-  // return (
-  //   <div>
-  //     <h1>FastAPI + React</h1>
-  //     <p>Message from FastAPI: {data}</p>
-  //   </div>
-  // );
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+  };
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (window.location.hostname === "localhost") {
+    window.location.replace(
+      `http://127.0.0.1:${window.location.port}${window.location.pathname}${window.location.search}`
+    );
+  }
 
   return (
-    <Router>
-      <div className="App">
+    <Container>
+      {user ? (
+        <>
+          <Typography variant="h5">Welcome, {user.username}!</Typography>
+          <Button variant="contained" color="secondary" onClick={handleLogout} sx={{ mt: 2 }}>
+            Logout
+          </Button>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
+          </Routes>
+        </>
+      ) : (
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={<Login />} /> {/* Default to login */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<CreateAccountPage />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Routes>
-      </div>
-    </Router>
+      )}
+    </Container>
   );
 }
 

@@ -1,32 +1,19 @@
-""" Main FastAPI application """
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+""" Main API router """
+from fastapi import APIRouter
+from app.auth import router as auth_router
 
+router = APIRouter()
 
-app = FastAPI()
-
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "localhost:3000"
-]
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-
-
-@app.get("/", tags=["root"])
-async def read_root() -> dict:
+# General routes
+@router.get("/", tags=["root"])
+async def read_root():
     """ Root API """
-    return {"message": "Hello World"}
+    return {"message": "Hello World, this is the Root API of the FastAPI app"}
 
-@app.get("/test")
+@router.get("/test")
 async def get_test():
     """ Test API """
-    return {"message": "Hello World:8000"}
+    return {"message": "Hello World, this is a test API"}
+
+# Include other sub-routers
+router.include_router(auth_router, prefix="/auth", tags=["Auth"])

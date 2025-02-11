@@ -3,8 +3,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { getCurrentUser, logout } from "./services/auth";
 import LoginPage from "./components/LoginPage";
 import CreateAccountPage from "./components/CreateAccountPage";
+import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import HomePage from "./components/HomePage";
 import { Button, Container, Typography } from "@mui/material";
+import ChangePasswordPage from "./components/ChangePasswordPage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -28,6 +30,12 @@ function App() {
     return <Typography>Loading...</Typography>;
   }
 
+  if (window.location.hostname === "localhost") {
+    window.location.replace(
+      `http://127.0.0.1:${window.location.port}${window.location.pathname}${window.location.search}`
+    );
+  }
+
   return (
     <Container>
       {user ? (
@@ -39,6 +47,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
           </Routes>
         </>
       ) : (
@@ -46,6 +55,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<CreateAccountPage />} />
           <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Routes>
       )}
     </Container>

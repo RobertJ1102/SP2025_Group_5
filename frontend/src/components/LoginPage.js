@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -31,7 +29,7 @@ function LoginPage() {
 
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => navigate("/"), 1000); // Redirect to home after login
+        setTimeout(() => (window.location.href = "/"), 1000);
       } else {
         const errorDetail = data.detail || "Login failed";
         setError(typeof errorDetail === "string" ? errorDetail : JSON.stringify(errorDetail));

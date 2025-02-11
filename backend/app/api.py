@@ -4,7 +4,7 @@ from app.auth import router as auth_router
 
 router = APIRouter()
 
-# ✅ General routes
+# General routes
 @router.get("/", tags=["root"])
 async def read_root():
     """ Root API """
@@ -15,5 +15,5 @@ async def get_test():
     """ Test API """
     return {"message": "Hello World, this is a test API"}
 
-# ✅ Include other sub-routers
+# Include other sub-routers
 router.include_router(auth_router, prefix="/auth", tags=["Auth"])

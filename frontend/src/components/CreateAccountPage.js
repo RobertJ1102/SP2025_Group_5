@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 function CreateAccountPage() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,7 +13,6 @@ function CreateAccountPage() {
     setError("");
     setSuccess(false);
 
-    // ✅ Basic validation
     if (!email || !password || !confirmPassword) {
       setError("All fields are required.");
       return;
@@ -26,7 +23,7 @@ function CreateAccountPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/auth/register", {
+      const response = await fetch("http://127.0.0.1:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -35,7 +32,7 @@ function CreateAccountPage() {
       const data = await response.json();
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => navigate("/"), 1000); // Redirect to home after account creation
+        setTimeout(() => (window.location.href = "/"), 1000);
       } else {
         setError(data.detail || "Registration failed.");
       }

@@ -1,12 +1,12 @@
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
-export const login = async (username, password) => {
+export const login = async (email, password) => {
   try {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     });
 
     return response.json();
@@ -24,18 +24,21 @@ export const logout = async () => {
 
 export async function getCurrentUser() {
   try {
-    const response = await fetch("http://localhost:8000/auth/me", {
+    const response = await fetch("http://127.0.0.1:8000/auth/me", {
       method: "GET",
-      credentials: "include", // Important to send session cookies
+      credentials: "include", // Critical for cookies
     });
 
+    console.log("GET /auth/me response:", response);
+
     if (!response.ok) {
-      return null; // Not authenticated
+      console.error("Auth check failed:", await response.text());
+      return null;
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Failed to fetch user:", error);
+    console.error("Error checking auth:", error);
     return null;
   }
 }

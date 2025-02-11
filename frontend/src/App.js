@@ -27,7 +27,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/map" element={<MapComponent />} />
           <Route path="/" element={<Login />} /> {/* Default to login */}
         </Routes>
       </div>

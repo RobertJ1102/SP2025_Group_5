@@ -9,31 +9,28 @@ const MapComponent = () => {
   const mapRef = useRef(null);
 
   useEffect(() => {
-    // Initialize the map when the component mounts
-    const map = new Map({
-      target: mapRef.current, // Bind map to div
-      layers: [
-        new TileLayer({
-          source: new OSM(), // OpenStreetMap tile layer
-        }),
-      ],
-      view: new View({
-        center: [0, 0], // Coordinates in EPSG:3857 projection
-        zoom: 2, // Zoom level
-      }),
+    const osmLayer = new TileLayer({
+      preload: Infinity,
+      source: new OSM(),
     });
 
-    return () => {
-      map.setTarget(null); // Cleanup on unmount
-    };
+    const map = new Map({
+      target: mapRef.current,
+      layers: [osmLayer],
+      view: new View({
+        center: [0, 0],
+        zoom: 0,
+      }),
+    });
+    return () => map.setTarget(null);
   }, []);
 
   return (
     <div
-      ref={mapRef}
       style={{ width: "100%", height: "400px" }} // Set map size
+      ref={mapRef}
       className="map-container"
-    />
+    ></div>
   );
 };
 

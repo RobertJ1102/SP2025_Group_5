@@ -16,6 +16,11 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - farefinder-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # FastAPI Backend Service
   backend:
@@ -23,7 +28,8 @@ services:
     container_name: backend_container
     restart: always
     depends_on:
-      - db
+      db: 
+        condition: service_healthy
     environment:
       DATABASE_URL: "mysql+pymysql://farefinder_user:password@db:3306/farefinder_db"
     ports:

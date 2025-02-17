@@ -1,6 +1,7 @@
 """ Main API router """
 from fastapi import APIRouter
 from app.auth import router as auth_router
+from app.uber import router as uber_router
 
 router = APIRouter()
 
@@ -17,3 +18,4 @@ async def get_test():
 
 # Include other sub-routers
 router.include_router(auth_router, prefix="/auth", tags=["Auth"])
+router.include_router(uber_router, prefix="/uber", tags=["Uber"])

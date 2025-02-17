@@ -13,6 +13,8 @@ MAIL_FROM = os.getenv("MAIL_FROM", "your_email@gmail.com")
 MAIL_SERVER = "smtp.gmail.com"
 MAIL_PORT = 587
 MAIL_FROM_NAME = "FareFinder Support"
+UBER_SERVER_TOKEN = os.getenv("UBER_SERVER_TOKEN", "123")
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "123")
 
 conf = ConnectionConfig(
     MAIL_USERNAME=MAIL_USERNAME,

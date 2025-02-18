@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box, Alert, Paper } from "@mui/material";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -12,8 +12,8 @@ function LoginPage() {
     setError("");
     setSuccess(false);
 
-    if (!email || !password) {
-      setError("Please enter both email and password.");
+    if (!username || !password) {
+      setError("Please enter both username and password.");
       return;
     }
 
@@ -22,7 +22,7 @@ function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -50,12 +50,12 @@ function LoginPage() {
           {success && <Alert severity="success" sx={{ mb: 2 }}>Login successful!</Alert>}
           <form onSubmit={handleSubmit}>
             <TextField
-              label="Email"
-              type="email"
+              label="Username"
+              type="text"
               fullWidth
               margin="normal"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               variant="outlined"
               sx={{ backgroundColor: "white" }}

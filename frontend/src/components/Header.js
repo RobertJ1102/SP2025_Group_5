@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 function Header({ onLogout }) {
@@ -7,6 +7,10 @@ function Header({ onLogout }) {
 
   const handleHomeClick = () => {
     navigate('/');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   return (
@@ -21,6 +25,9 @@ function Header({ onLogout }) {
       <Toolbar>
         <Button color="inherit" onClick={handleHomeClick}>
           Home
+        </Button>
+        <Button color="inherit" onClick={handleProfileClick}>
+          Profile
         </Button>
         <Box sx={{ flexGrow: 1 }} />
         <Button color="inherit" onClick={onLogout}>

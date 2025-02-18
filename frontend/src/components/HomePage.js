@@ -14,11 +14,9 @@ function HomePage() {
         </Typography>
         <Box sx={{ marginTop: 2 }}>
           <Typography variant="h6">🚗 Features Coming Soon:</Typography>
-          <ul>
-            <li>Check fare estimates for different pickup points</li>
-            <li>Compare Uber and Lyft prices dynamically</li>
-            <li>Find the cheapest and fastest routes</li>
-          </ul>
+          <Typography variant="body1">Check fare estimates for different pickup points</Typography>
+          <Typography variant="body1">Compare Uber and Lyft prices dynamically</Typography>
+          <Typography variant="body1">Find the cheapest and fastest routes</Typography>
         </Box>
       </Paper>
     </Container>

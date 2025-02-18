@@ -67,7 +67,7 @@ def get_price_estimates(start_latitude: float, start_longitude: float,
     estimates = []
     for product in products:
         # Randomize fare within a range
-        low_estimate = product["base_fare"] + (product["per_km"] * distance_km)
+        low_estimate = product["base_fare"] + (product["per_km"] * distance_km) + random.uniform(-1, 1)
         high_estimate = low_estimate * random.uniform(1.1, 1.5)
         estimate_str = f"${low_estimate:.2f} - ${high_estimate:.2f}"
 

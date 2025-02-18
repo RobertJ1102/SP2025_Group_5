@@ -3,18 +3,35 @@ import math
 import random
 import requests
 from fastapi import APIRouter, HTTPException
-from .config import UBER_CLIENT_ID, UBER_CLIENT_SECRET, GMAPS_API_KEY
+from .config import UBER_CLIENT_ID, UBER_CLIENT_SECRET, GMAP_API_KEY
 
 router = APIRouter()
 
 # Uber API URLs
 UBER_TOKEN_URL = "https://auth.uber.com/oauth/v2/token"
 UBER_ESTIMATE_URL = "https://api.uber.com/v1.2/estimates/price"
+MOCK_ESTIMATE_URL = "http://localhost:8000/estimates/price"
+
+USE_GOOGLE_MAPS = True  # Use Google Maps API for reverse geocoding
+
+if GMAP_API_KEY is None:
+    USE_GOOGLE_MAPS = False
 
 # Earth's radius in meters
 EARTH_RADIUS = 6378137
 
+@router.get("/best-uber-fare/")
+def get_best_uber_fare(start_lat: float, start_lon: float, end_lat: float, end_lon: float):
+    """
+    API Endpoint to find the best Uber fare by checking multiple nearby locations.
+    """
+    try:
+        best_fare = find_best_fare(start_lat, start_lon, end_lat, end_lon)
+        return best_fare
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
+# Currently Unused
 def get_uber_access_token():
     """
     Fetches an OAuth access token for Uber API using Client Credentials.
@@ -37,19 +54,6 @@ def get_uber_access_token():
         status_code=500,
         detail=f"Failed to get Uber access token: {response.json()}"
     )
-
-
-@router.get("/best-uber-fare/")
-def get_best_uber_fare(start_lat: float, start_lon: float, end_lat: float, end_lon: float):
-    """
-    API Endpoint to find the best Uber fare by checking multiple nearby locations.
-    """
-    try:
-        best_fare = find_best_fare(start_lat, start_lon, end_lat, end_lon)
-        return best_fare
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
-
 
 def move_location(lat, lon, meters, direction):
     """
@@ -78,10 +82,14 @@ def is_valid_street(lat, lon):
     Checks if the given latitude/longitude corresponds to a valid street address.
     Uses Google Maps Reverse Geocoding API.
     """
-    url =f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GMAPS_API_KEY}"
+    if not USE_GOOGLE_MAPS:
+        return True
+
+    url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GMAP_API_KEY}"
     response = requests.get(url, timeout=10).json()
 
     for result in response.get("results", []):
+        print(result)
         if "route" in result.get("types", []):  # "route" type indicates a valid street
             return True
     return False
@@ -89,13 +97,8 @@ def is_valid_street(lat, lon):
 
 def get_uber_price_estimates(start_lat, start_lon, end_lat, end_lon):
     """
-    Queries Uber API to get ride price estimates between the start and end locations.
+    Queries the mock API to get ride price estimates between the start and end locations.
     """
-    access_token = get_uber_access_token()
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
     params = {
         "start_latitude": start_lat,
         "start_longitude": start_lon,
@@ -104,10 +107,8 @@ def get_uber_price_estimates(start_lat, start_lon, end_lat, end_lon):
         "seat_count": 1
     }
 
-    response = requests.get(UBER_ESTIMATE_URL, headers=headers, params=params, timeout=10)
+    response = requests.get(MOCK_ESTIMATE_URL, params=params, timeout=10)
 
-    if response.status_code == 401:
-        raise HTTPException(status_code=401, detail="Invalid Uber API Token")
     if response.status_code != 200:
         raise HTTPException(status_code=response.status_code, detail=response.json())
 
@@ -177,6 +178,8 @@ def random_offset(lat, lon, max_offset=400):
 
     return round(new_lat, 6), round(new_lon, 6)
 
+
+# Temporary endpoint for testing
 @router.get("/best-uber-fare-test/")
 def get_fake_uber_fare(start_lat: float, start_lon: float):
     """

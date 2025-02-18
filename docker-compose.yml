@@ -28,7 +28,7 @@ services:
     container_name: backend_container
     restart: always
     depends_on:
-      db: 
+      db:
         condition: service_healthy
     environment:
       DATABASE_URL: "mysql+pymysql://farefinder_user:password@db:3306/farefinder_db"

@@ -23,7 +23,7 @@ const HomePage = () => {
       <Container
         maxWidth="xs"
         sx={{
-          position: "absolute",
+          position: "absolute ",
           zIndex: 1,
           color: "white",
           bottom: 20,

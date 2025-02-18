@@ -14,6 +14,9 @@ MOCK_ESTIMATE_URL = "http://localhost:8000/estimates/price"
 
 USE_GOOGLE_MAPS = True  # Use Google Maps API for reverse geocoding
 
+if GMAP_API_KEY is None:
+    USE_GOOGLE_MAPS = False
+
 # Earth's radius in meters
 EARTH_RADIUS = 6378137
 

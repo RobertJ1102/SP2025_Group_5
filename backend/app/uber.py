@@ -12,6 +12,8 @@ UBER_TOKEN_URL = "https://auth.uber.com/oauth/v2/token"
 UBER_ESTIMATE_URL = "https://api.uber.com/v1.2/estimates/price"
 MOCK_ESTIMATE_URL = "http://localhost:8000/estimates/price"
 
+USE_GOOGLE_MAPS = True  # Use Google Maps API for reverse geocoding
+
 # Earth's radius in meters
 EARTH_RADIUS = 6378137
 
@@ -77,10 +79,14 @@ def is_valid_street(lat, lon):
     Checks if the given latitude/longitude corresponds to a valid street address.
     Uses Google Maps Reverse Geocoding API.
     """
+    if not USE_GOOGLE_MAPS:
+        return True
+
     url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GMAP_API_KEY}"
     response = requests.get(url, timeout=10).json()
 
     for result in response.get("results", []):
+        print(result)
         if "route" in result.get("types", []):  # "route" type indicates a valid street
             return True
     return False

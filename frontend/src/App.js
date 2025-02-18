@@ -7,7 +7,6 @@ import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import HomePage from "./components/HomePage";
 import { Button, Container, Typography } from "@mui/material";
 import ChangePasswordPage from "./components/ChangePasswordPage";
-import MapComponent from "./components/MapComponent";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -46,11 +45,10 @@ function App() {
             variant="contained"
             color="secondary"
             onClick={handleLogout}
-            sx={{ mt: 2 }}
+            sx={{ mt: 1, zIndex: 1, position: "absolute", top: 20, right: 20 }}
           >
             Logout
           </Button>
-          <MapComponent />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<Navigate to="/" />} />

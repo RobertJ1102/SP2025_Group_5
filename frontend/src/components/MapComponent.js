@@ -27,7 +27,7 @@ const MapComponent = () => {
 
   return (
     <div
-      style={{ width: "100%", height: "400px" }} // Set map size
+      style={{ width: "100%", height: "100%" }} // Set map size
       ref={mapRef}
       className="map-container"
     ></div>

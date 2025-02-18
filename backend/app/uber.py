@@ -32,11 +32,11 @@ def get_uber_access_token():
 
     if response.status_code == 200:
         return response.json()["access_token"]
-    else:
-        raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to get Uber access token: {response.json()}"
-        )
+
+    raise HTTPException(
+        status_code=500,
+        detail=f"Failed to get Uber access token: {response.json()}"
+    )
 
 
 @router.get("/best-uber-fare/")
@@ -108,7 +108,7 @@ def get_uber_price_estimates(start_lat, start_lon, end_lat, end_lon):
 
     if response.status_code == 401:
         raise HTTPException(status_code=401, detail="Invalid Uber API Token")
-    elif response.status_code != 200:
+    if response.status_code != 200:
         raise HTTPException(status_code=response.status_code, detail=response.json())
 
     return response.json().get("prices", [])

@@ -1,16 +1,42 @@
 """ Uber API functions for finding the best fare for a given location. """
 import math
+import random
 import requests
-from uber_rides.session import Session
-from uber_rides.client import UberRidesClient
 from fastapi import APIRouter, HTTPException
-from .config import UBER_SERVER_TOKEN
-from .config import GOOGLE_MAPS_API_KEY
+from .config import UBER_CLIENT_ID, UBER_CLIENT_SECRET, GMAPS_API_KEY
 
 router = APIRouter()
 
+# Uber API URLs
+UBER_TOKEN_URL = "https://auth.uber.com/oauth/v2/token"
+UBER_ESTIMATE_URL = "https://api.uber.com/v1.2/estimates/price"
+
 # Earth's radius in meters
 EARTH_RADIUS = 6378137
+
+
+def get_uber_access_token():
+    """
+    Fetches an OAuth access token for Uber API using Client Credentials.
+    Uber API does NOT support scope for Client Credentials Grant.
+    """
+    data = {
+        "client_id": UBER_CLIENT_ID,
+        "client_secret": UBER_CLIENT_SECRET,
+        "grant_type": "client_credentials"
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    response = requests.post(UBER_TOKEN_URL, data=data, headers=headers, timeout=10)
+
+    if response.status_code == 200:
+        return response.json()["access_token"]
+    else:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to get Uber access token: {response.json()}"
+        )
 
 
 @router.get("/best-uber-fare/")
@@ -24,59 +50,69 @@ def get_best_uber_fare(start_lat: float, start_lon: float, end_lat: float, end_l
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
+
 def move_location(lat, lon, meters, direction):
     """
     Moves a latitude/longitude coordinate by a given number of meters
     in a specified direction (N, S, E, W, NE, NW, SE, SW).
     """
     delta_lat = (meters / EARTH_RADIUS) * (180 / math.pi)
-    delta_lon = (meters / EARTH_RADIUS) * (180 / math.pi) / math.cos(lat * math.pi / 180)
+    delta_lon = (meters / EARTH_RADIUS) * (180 / math.pi) / math.cos(math.radians(lat))
 
-    if direction == "N":
-        return lat + delta_lat, lon
-    elif direction == "S":
-        return lat - delta_lat, lon
-    elif direction == "E":
-        return lat, lon + delta_lon
-    elif direction == "W":
-        return lat, lon - delta_lon
-    elif direction == "NE":
-        return lat + delta_lat, lon + delta_lon
-    elif direction == "NW":
-        return lat + delta_lat, lon - delta_lon
-    elif direction == "SE":
-        return lat - delta_lat, lon + delta_lon
-    elif direction == "SW":
-        return lat - delta_lat, lon - delta_lon
+    direction_map = {
+        "N": (lat + delta_lat, lon),
+        "S": (lat - delta_lat, lon),
+        "E": (lat, lon + delta_lon),
+        "W": (lat, lon - delta_lon),
+        "NE": (lat + delta_lat, lon + delta_lon),
+        "NW": (lat + delta_lat, lon - delta_lon),
+        "SE": (lat - delta_lat, lon + delta_lon),
+        "SW": (lat - delta_lat, lon - delta_lon),
+    }
+
+    return direction_map.get(direction, (lat, lon))
+
 
 def is_valid_street(lat, lon):
     """
     Checks if the given latitude/longitude corresponds to a valid street address.
     Uses Google Maps Reverse Geocoding API.
     """
-    url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GOOGLE_MAPS_API_KEY}"
-    response = requests.get(url).json()
+    url =f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GMAPS_API_KEY}"
+    response = requests.get(url, timeout=10).json()
 
     for result in response.get("results", []):
-        if "route" in result["types"]:  # "route" type indicates a valid street
+        if "route" in result.get("types", []):  # "route" type indicates a valid street
             return True
     return False
+
 
 def get_uber_price_estimates(start_lat, start_lon, end_lat, end_lon):
     """
     Queries Uber API to get ride price estimates between the start and end locations.
     """
-    session = Session(server_token=UBER_SERVER_TOKEN)
-    client = UberRidesClient(session)
+    access_token = get_uber_access_token()
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    params = {
+        "start_latitude": start_lat,
+        "start_longitude": start_lon,
+        "end_latitude": end_lat,
+        "end_longitude": end_lon,
+        "seat_count": 1
+    }
 
-    response = client.get_price_estimates(
-        start_latitude=start_lat,
-        start_longitude=start_lon,
-        end_latitude=end_lat,
-        end_longitude=end_lon,
-        seat_count=1
-    )
-    return response.json.get("prices", [])
+    response = requests.get(UBER_ESTIMATE_URL, headers=headers, params=params, timeout=10)
+
+    if response.status_code == 401:
+        raise HTTPException(status_code=401, detail="Invalid Uber API Token")
+    elif response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.json())
+
+    return response.json().get("prices", [])
+
 
 def find_best_fare(start_lat, start_lon, end_lat, end_lon):
     """
@@ -115,9 +151,43 @@ def find_best_fare(start_lat, start_lon, end_lat, end_lon):
                 price = ride.get("low_estimate")
                 ride_type = ride.get("display_name")
 
-                if best_price is None or price < best_price:
+                if best_price is None or (price is not None and price < best_price):
                     best_price = price
                     best_location = label
                     best_ride_type = ride_type
 
-    return {"best_location": best_location, "best_price": best_price, "best_ride_type": best_ride_type}
+    return {
+        "best_location": best_location,
+        "best_price": best_price,
+        "best_ride_type": best_ride_type
+    }
+
+
+def random_offset(lat, lon, max_offset=400):
+    """
+    Generates a random location within max_offset feet of the given coordinates.
+    """
+    meters = random.uniform(0, max_offset * 0.3048)  # Convert feet to meters
+    angle = random.uniform(0, 360)  # Random direction
+    delta_lat = (meters / EARTH_RADIUS) * (180 / math.pi)
+    delta_lon = delta_lat / math.cos(math.radians(lat))
+
+    new_lat = lat + delta_lat * math.sin(math.radians(angle))
+    new_lon = lon + delta_lon * math.cos(math.radians(angle))
+
+    return round(new_lat, 6), round(new_lon, 6)
+
+@router.get("/best-uber-fare-test/")
+def get_fake_uber_fare(start_lat: float, start_lon: float):
+    """
+    Returns a fake 'best' ride estimate.
+    """
+    best_pickup_lat, best_pickup_lon = random_offset(start_lat, start_lon)
+    fake_price = round(random.uniform(10, 50), 2)  # Fake price between $10 - $50
+    ride_type = random.choice(["UberX", "UberXL", "Comfort", "Black"])
+
+    return {
+        "best_pickup_location": {"latitude": best_pickup_lat, "longitude": best_pickup_lon},
+        "estimated_price": fake_price,
+        "ride_type": ride_type
+    }

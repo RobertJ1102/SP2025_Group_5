@@ -50,7 +50,7 @@ def get_price_estimates(start_latitude: float, start_longitude: float,
     """ Get price estimates for different Uber products """
 
     if seat_count > 2:
-        raise HTTPException(status_code=400, 
+        raise HTTPException(status_code=400,
                             detail="seat_count cannot be greater than 2 for uberPOOL.")
 
     # Calculate distance between start and end points
@@ -67,7 +67,8 @@ def get_price_estimates(start_latitude: float, start_longitude: float,
     estimates = []
     for product in products:
         # Randomize fare within a range
-        low_estimate = product["base_fare"] + (product["per_km"] * distance_km) + random.uniform(-1, 1)
+        dist = product["per_km"] * distance_km
+        low_estimate = product["base_fare"] + dist + random.uniform(-1, 1)
         high_estimate = low_estimate * random.uniform(1.1, 1.5)
         estimate_str = f"${low_estimate:.2f} - ${high_estimate:.2f}"
 

@@ -10,7 +10,6 @@ import ChangePasswordPage from "./components/ChangePasswordPage";
 import Header from './components/Header';
 import ProfilePage from './components/ProfilePage/ProfilePage';
 
-
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

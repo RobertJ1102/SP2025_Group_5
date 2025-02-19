@@ -1,7 +1,8 @@
 """This module contains the SQLAlchemy model for the User table."""
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from .database import Base
+from datetime import datetime
 
 # pylint: disable=too-few-public-methods
 class User(Base):
@@ -29,5 +30,6 @@ class Address(Base):
     written_address = Column(String(255))
     longitude = Column(String(50))
     latitude = Column(String(50))
+    timestamp = Column(DateTime, default=datetime.now)
 
     user = relationship("User", back_populates="addresses")

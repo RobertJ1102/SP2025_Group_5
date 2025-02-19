@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
+import { Container, TextField, Button, Typography, Box, Alert, Paper } from "@mui/material";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -12,8 +12,8 @@ function LoginPage() {
     setError("");
     setSuccess(false);
 
-    if (!email || !password) {
-      setError("Please enter both email and password.");
+    if (!username || !password) {
+      setError("Please enter both username and password.");
       return;
     }
 
@@ -22,7 +22,7 @@ function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -41,41 +41,64 @@ function LoginPage() {
 
   return (
     <Container maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: "center" }}>
-        <Typography variant="h4" gutterBottom>
-          Login
-        </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">Login successful!</Alert>}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Email"
-            type="email"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <TextField
-            label="Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+      <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
+        <Box sx={{ textAlign: "center" }}>
+          <Typography variant="h4" gutterBottom>
             Login
-          </Button>
-        </form>
-      </Box>
-      <Box sx={{ mt: 2, textAlign: "center" }}>
-        <Button variant="outlined" color="secondary" fullWidth onClick={() => (window.location.href = "/register")}>
-          Create an Account
-        </Button>
-      </Box>
+          </Typography>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mb: 2 }}>Login successful!</Alert>}
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Username"
+              type="text"
+              fullWidth
+              margin="normal"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              variant="outlined"
+              sx={{ backgroundColor: "white" }}
+            />
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              variant="outlined"
+              sx={{ backgroundColor: "white" }}
+            />
+            <Button 
+              type="submit" 
+              variant="contained" 
+              color="primary" 
+              fullWidth 
+              sx={{ mt: 2 }}
+            >
+              Login
+            </Button>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+              <Button 
+                variant="text" 
+                color="primary" 
+                onClick={() => (window.location.href = "/forgot-password")}
+              >
+                Forgot Password?
+              </Button>
+              <Button 
+                variant="text" 
+                color="primary" 
+                onClick={() => (window.location.href = "/register")}
+              >
+                Create Account
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Paper>
     </Container>
   );
 }

@@ -7,6 +7,8 @@ import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import HomePage from "./components/HomePage";
 import { Button, Container, Typography } from "@mui/material";
 import ChangePasswordPage from "./components/ChangePasswordPage";
+import Header from './components/Header';
+import ProfilePage from './components/ProfilePage/ProfilePage';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -37,22 +39,15 @@ function App() {
   }
 
   return (
-    <Container>
+    <Container sx={{ paddingTop: '64px' }}>
       {user ? (
         <>
-          <Typography variant="h5">Welcome, {user.username}!</Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleLogout}
-            sx={{ mt: 1, zIndex: 1, position: "absolute", top: 20, right: 20 }}
-          >
-            Logout
-          </Button>
+          <Header onLogout={handleLogout} />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<Navigate to="/" />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
+            <Route path="/profile/*" element={<ProfilePage />} />
           </Routes>
         </>
       ) : (

@@ -3,7 +3,6 @@ import random
 from math import radians, sin, cos, sqrt, atan2
 from fastapi import APIRouter, HTTPException
 from app.auth import router as auth_router
-from app.profile import router as profile_router
 from app.uber import router as uber_router
 from .models import PriceEstimate, PriceEstimatesResponse
 
@@ -91,5 +90,4 @@ def get_price_estimates(start_latitude: float, start_longitude: float,
 
 # Include other sub-routers
 router.include_router(auth_router, prefix="/auth", tags=["Auth"])
-router.include_router(profile_router, prefix="/profile", tags=["Profile"])
 router.include_router(uber_router, prefix="/uber", tags=["Uber"])

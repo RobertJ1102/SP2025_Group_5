@@ -5,10 +5,8 @@ import LoginPage from "./components/LoginPage";
 import CreateAccountPage from "./components/CreateAccountPage";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import HomePage from "./components/HomePage";
-import { Container, Typography } from "@mui/material";
+import { Button, Container, Typography } from "@mui/material";
 import ChangePasswordPage from "./components/ChangePasswordPage";
-import Header from './components/Header';
-import ProfilePage from './components/ProfilePage/ProfilePage';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,15 +37,22 @@ function App() {
   }
 
   return (
-    <Container sx={{ paddingTop: '64px' }}>
+    <Container>
       {user ? (
         <>
-          <Header onLogout={handleLogout} />
+          <Typography variant="h5">Welcome, {user.username}!</Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleLogout}
+            sx={{ mt: 1, zIndex: 1, position: "absolute", top: 20, right: 20 }}
+          >
+            Logout
+          </Button>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<Navigate to="/" />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
-            <Route path="/profile/*" element={<ProfilePage />} />
           </Routes>
         </>
       ) : (

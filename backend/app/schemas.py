@@ -3,15 +3,10 @@ from pydantic import BaseModel, EmailStr
 
 class UserLogin(BaseModel):
     """UserLogin model"""
-    username: str
+    email: EmailStr
     password: str
 
 class UserCreate(UserLogin):
     """UserCreate model"""
     email: EmailStr
-    username: str
     password: str
-
-    class Config:
-        orm_mode = True
-

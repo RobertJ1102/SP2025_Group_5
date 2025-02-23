@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
 
 function CreateAccountPage() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,7 +14,7 @@ function CreateAccountPage() {
     setError("");
     setSuccess(false);
 
-    if (!email || !password || !confirmPassword) {
+    if (!username || !email || !password || !confirmPassword) {
       setError("All fields are required.");
       return;
     }
@@ -26,7 +27,7 @@ function CreateAccountPage() {
       const response = await fetch("http://127.0.0.1:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
@@ -50,6 +51,15 @@ function CreateAccountPage() {
         {error && <Alert severity="error">{error}</Alert>}
         {success && <Alert severity="success">Account created! You can now log in.</Alert>}
         <form onSubmit={handleSubmit}>
+          <TextField
+            label="Username"
+            type="text"
+            fullWidth
+            margin="normal"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
           <TextField
             label="Email"
             type="email"

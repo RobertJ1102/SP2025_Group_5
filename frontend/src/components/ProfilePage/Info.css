@@ -1,0 +1,32 @@
+/* frontend/src/components/ProfilePage/Info.css */
+
+.info-container {
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .info-title {
+    margin-bottom: 24px;
+    color: #333;
+  }
+  
+  .info-detail {
+    margin-bottom: 20px;
+    color: #555;
+  }
+
+  .info-button {
+    margin-top: 20px;
+    align-self: flex-start;
+  }
+
+  .text-field-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }

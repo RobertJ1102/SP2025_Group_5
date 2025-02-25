@@ -1,11 +1,13 @@
 import React from 'react';
+import { Typography, Box } from '@mui/material';
+import './Info.css';
 
 function Preferences() {
   return (
-    <div>
-      <h2>Preferences</h2>
-      <p>This is the Preferences page.</p>
-    </div>
+    <Box className="container">
+      <Typography variant="h4" className="title">Preferences</Typography>
+      <Typography variant="body1" className="detail">This is the Preferences page.</Typography>
+    </Box>
   );
 }
 

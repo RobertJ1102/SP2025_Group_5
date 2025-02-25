@@ -89,7 +89,7 @@ def is_valid_street(lat, lon):
     response = requests.get(url, timeout=10).json()
 
     for result in response.get("results", []):
-        print(result)
+        #print(result)
         if "route" in result.get("types", []):  # "route" type indicates a valid street
             return True
     return False

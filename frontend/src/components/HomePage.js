@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Typography, Paper, Box } from "@mui/material";
 import MapComponent from "./MapComponent";
 import FareInputComponent from "./FareInputComponent";
+import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
 
 const HomePage = () => {
   return (
@@ -11,11 +12,11 @@ const HomePage = () => {
           FareFinder
         </Typography>
         {/* Map Section */}
-        <Box sx={{ width: "100%", height: "300px", mb: 2 }}>
+        {/* <Box sx={{ width: "100%", height: "300px", mb: 2 }}>
           <MapComponent />
-        </Box>
+        </Box> */}
         {/* Fare Input Section */}
-        <FareInputComponent />
+        <RouteEstimatorWithFields />
       </Paper>
     </Container>
   );

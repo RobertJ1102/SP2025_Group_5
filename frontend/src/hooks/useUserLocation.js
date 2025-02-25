@@ -14,9 +14,12 @@ const useUserLocation = () => {
       (position) => {
         const coords = [position.coords.longitude, position.coords.latitude];
         const accuracy = position.coords.accuracy;
+
+        // Update state of coords and accuracy
         setLocation(coords);
         setAccuracy(accuracy);
 
+        //Post coodinate data to backend
         fetch("/api/update-location", {
           method: "POST",
           headers: {
@@ -37,6 +40,8 @@ const useUserLocation = () => {
       },
       { enableHighAccuracy: true }
     );
+
+    //Clean up resources on unmount
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };

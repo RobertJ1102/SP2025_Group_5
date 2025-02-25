@@ -1,7 +1,5 @@
 import React from "react";
 import { Container, Typography, Paper, Box } from "@mui/material";
-import MapComponent from "./MapComponent";
-import FareInputComponent from "./FareInputComponent";
 import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
 
 const HomePage = () => {

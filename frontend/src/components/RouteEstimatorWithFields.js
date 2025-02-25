@@ -4,43 +4,38 @@ import MapComponent from "./MapComponent";
 import useUserLocation from "../hooks/useUserLocation";
 import { setKey, fromLatLng, fromAddress } from "react-geocode";
 
-// Set your Google API key here.
+// Set your Google API key.
 setKey("AIzaSyC8Vrp8rhcNWAN9IJJfuZZ_5reIRaFfSU4");
 
 const RouteEstimatorWithFields = () => {
-  // Get the user's current location.
   const { location, error } = useUserLocation();
-
-  // State for addresses and coordinates.
   const [pickupAddress, setPickupAddress] = useState("");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [routeEstimation, setRouteEstimation] = useState(null);
   const [loading, setLoading] = useState(false);
-  // activeSelection determines whether a map click sets the pickup or destination.
   const [activeSelection, setActiveSelection] = useState("destination");
 
-  // When the user's location is available, reverse geocode to prefill the pickup address and set pickup coordinates.
+  // When the user's location is available, prefill the pickup address.
   useEffect(() => {
     if (location) {
+      // Note: location from useUserLocation is an array: [lng, lat].
       fromLatLng(location[1], location[0])
         .then((response) => {
           if (response.results && response.results[0]) {
             setPickupAddress(response.results[0].formatted_address);
           }
         })
-        .catch((err) => {
-          console.error("Reverse geocode error:", err);
-        });
+        .catch((err) => console.error("Reverse geocode error:", err));
       setPickupCoordinates({ lat: location[1], lng: location[0] });
     }
   }, [location]);
 
-  // Callback when a pickup point is selected on the map.
-  const handleSetPickup = (coords) => {
-    setPickupCoordinates({ lat: coords[1], lng: coords[0] });
-    fromLatLng(coords[1], coords[0])
+  // Map callbacks (receiving [lng, lat] arrays)
+  const handleSetPickup = (lonLat) => {
+    setPickupCoordinates({ lat: lonLat[1], lng: lonLat[0] });
+    fromLatLng(lonLat[1], lonLat[0])
       .then((response) => {
         if (response.results && response.results[0]) {
           setPickupAddress(response.results[0].formatted_address);
@@ -49,10 +44,9 @@ const RouteEstimatorWithFields = () => {
       .catch((err) => console.error("Reverse geocode error:", err));
   };
 
-  // Callback when a destination is selected on the map.
-  const handleSetDestination = (coords) => {
-    setDestinationCoordinates({ lat: coords[1], lng: coords[0] });
-    fromLatLng(coords[1], coords[0])
+  const handleSetDestination = (lonLat) => {
+    setDestinationCoordinates({ lat: lonLat[1], lng: lonLat[0] });
+    fromLatLng(lonLat[1], lonLat[0])
       .then((response) => {
         if (response.results && response.results[0]) {
           setDestinationAddress(response.results[0].formatted_address);
@@ -61,7 +55,7 @@ const RouteEstimatorWithFields = () => {
       .catch((err) => console.error("Reverse geocode error:", err));
   };
 
-  // When the user edits the pickup text field, update its coordinates on blur.
+  // Update coordinates when text fields are blurred.
   const updatePickupFromText = () => {
     if (pickupAddress) {
       fromAddress(pickupAddress)
@@ -75,7 +69,6 @@ const RouteEstimatorWithFields = () => {
     }
   };
 
-  // When the user edits the destination text field, update its coordinates on blur.
   const updateDestinationFromText = () => {
     if (destinationAddress) {
       fromAddress(destinationAddress)
@@ -89,7 +82,7 @@ const RouteEstimatorWithFields = () => {
     }
   };
 
-  // Estimate route by calling the internal API.
+  // Call internal API to estimate route.
   const estimateRoute = async () => {
     if (!pickupCoordinates || !destinationCoordinates) {
       console.error("Both pickup and destination must be set");
@@ -124,7 +117,6 @@ const RouteEstimatorWithFields = () => {
         <Typography variant="h5" align="center" gutterBottom>
           Route Estimator
         </Typography>
-        {/* Pickup and Destination Text Fields */}
         <Box sx={{ mb: 2 }}>
           <TextField
             label="Pickup Location"
@@ -143,15 +135,19 @@ const RouteEstimatorWithFields = () => {
             onBlur={updateDestinationFromText}
           />
         </Box>
-        {/* Map Component */}
         <Box sx={{ width: "100%", height: "300px", mb: 2 }}>
           <MapComponent
             activeSelection={activeSelection}
             onSetPickup={handleSetPickup}
             onSetDestination={handleSetDestination}
+            // Provide the user's current location to the map.
+            currentLocation={
+              pickupCoordinates ? pickupCoordinates : location ? { lat: location[1], lng: location[0] } : null
+            }
+            pickupPoint={pickupCoordinates}
+            destinationPoint={destinationCoordinates}
           />
         </Box>
-        {/* Buttons to Toggle Map Selection Mode */}
         <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
           <Button
             variant={activeSelection === "pickup" ? "contained" : "outlined"}

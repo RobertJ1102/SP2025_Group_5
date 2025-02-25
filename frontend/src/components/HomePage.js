@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Typography, Paper, Box } from "@mui/material";
 import MapComponent from "./MapComponent";
+import FareInputComponent from "./FareInputComponent";
 
 const HomePage = () => {
   return (
@@ -8,12 +9,12 @@ const HomePage = () => {
       {/* Full-Screen Background Map */}
       <Box
         sx={{
-          position: "fixed", // Fixed ensures it stays full-screen
+          position: "fixed",
           top: 0,
           left: 0,
           width: "100vw",
           height: "100vh",
-          zIndex: 0, // Keeps it interactive but behind the content
+          zIndex: 0,
         }}
       >
         <MapComponent />
@@ -23,7 +24,7 @@ const HomePage = () => {
       <Container
         maxWidth="xs"
         sx={{
-          position: "absolute ",
+          position: "absolute",
           zIndex: 1,
           color: "white",
           bottom: 20,
@@ -36,24 +37,17 @@ const HomePage = () => {
             padding: 3,
             marginTop: 4,
             textAlign: "center",
-            backgroundColor: "rgba(255, 255, 255, 0.9)", // Semi-transparent background for readability
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
             backdropFilter: "blur(5px)",
           }}
         >
           <Typography variant="h4" gutterBottom>
             Welcome to FareFinder
           </Typography>
-          <Typography variant="body1">
-            This application helps you find the best nearby location to book an
-            Uber ride by comparing fares within a 400ft radius.
-          </Typography>
+          <Typography variant="body1">Find the best nearby pickup location for your Uber ride.</Typography>
+          {/* Fare Input Component */}
           <Box sx={{ marginTop: 2 }}>
-            <Typography variant="h6">🚗 Features Coming Soon:</Typography>
-            <ul>
-              <li>Check fare estimates for different pickup points</li>
-              <li>Compare Uber and Lyft prices dynamically</li>
-              <li>Find the cheapest and fastest routes</li>
-            </ul>
+            <FareInputComponent />
           </Box>
         </Paper>
       </Container>

@@ -102,3 +102,60 @@ def get_user_history(request: Request, db: Session = Depends(get_db)):
     ]
 
     return history_data
+
+@router.get("/preferences")
+def get_user_preferences(request: Request, db: Session = Depends(get_db)):
+    """Fetch user preferences using session token."""
+    # Extract session token from cookies
+    session_token = request.cookies.get("session")
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Verify session to get the username
+    username = verify_session(session_token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+    # Query the database for user preferences
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {
+        "search_range": user.search_range,
+        "price_range": user.max_price
+    }
+
+@router.put("/preferencesupdate")
+def update_user_preferences(
+    request: Request,
+    db: Session = Depends(get_db),
+    preferences_data: dict = Body(...)
+):
+    """Update user preferences using session token."""
+    # Extract session token from cookies
+    session_token = request.cookies.get("session")
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Verify session to get the username
+    username = verify_session(session_token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+    # Query the database for the user
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Update user preferences
+    user.search_range = preferences_data.get("search_range", user.search_range)
+    user.max_price = preferences_data.get("price_range", user.max_price)
+
+    # Commit changes to the database
+    db.commit()
+
+    return {
+        "search_range": user.search_range,
+        "price_range": user.max_price
+    }

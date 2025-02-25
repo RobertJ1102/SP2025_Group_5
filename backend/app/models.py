@@ -21,6 +21,8 @@ class User(Base):
     home_address = Column(String(255), default="")
     home_longitude = Column(String(50), default="")
     home_latitude = Column(String(50), default="")
+    search_range = Column(Integer, default=400)  # Search range in feet
+    max_price = Column(Integer, default=50)  # Maximum price willing to pay
 
     addresses = relationship("Address", back_populates="user")
 

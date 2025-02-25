@@ -107,6 +107,38 @@ const RouteEstimatorWithFields = () => {
     setLoading(false);
   };
 
+  // Generate and open Uber deep link.
+  const handleOpenUber = () => {
+    if (!pickupCoordinates || !destinationCoordinates) {
+      console.error("Both pickup and destination must be set to open in Uber");
+      return;
+    }
+    // Replace these with your actual values.
+    const CLIENT_ID = "QQFB2_v9dmmR9vnOq7BC7cTTAesOdHM4erouwgAk";
+    const PRODUCT_ID = "2d1d002b-d4d0-4411-98e1-673b244878b2"; // sample product id
+
+    const pickupData = {
+      latitude: pickupCoordinates.lat,
+      longitude: pickupCoordinates.lng,
+      addressLine1: pickupAddress,
+      addressLine2: "",
+    };
+    const dropData = {
+      latitude: destinationCoordinates.lat,
+      longitude: destinationCoordinates.lng,
+      addressLine1: destinationAddress,
+      addressLine2: "",
+    };
+
+    const uberDeepLink =
+      `https://m.uber.com/looking?client_id=${CLIENT_ID}` +
+      `&pickup=${encodeURIComponent(JSON.stringify(pickupData))}` +
+      `&drop[0]=${encodeURIComponent(JSON.stringify(dropData))}` +
+      `&product_id=${PRODUCT_ID}`;
+
+    window.location.href = uberDeepLink;
+  };
+
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -140,7 +172,6 @@ const RouteEstimatorWithFields = () => {
             activeSelection={activeSelection}
             onSetPickup={handleSetPickup}
             onSetDestination={handleSetDestination}
-            // Provide the user's current location to the map.
             currentLocation={
               pickupCoordinates ? pickupCoordinates : location ? { lat: location[1], lng: location[0] } : null
             }
@@ -183,6 +214,11 @@ const RouteEstimatorWithFields = () => {
             </Typography>
           </Box>
         )}
+        <Box sx={{ mt: 2 }}>
+          <Button variant="contained" fullWidth onClick={handleOpenUber}>
+            Open in Uber
+          </Button>
+        </Box>
       </Paper>
     </Container>
   );

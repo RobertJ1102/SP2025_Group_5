@@ -46,8 +46,16 @@ function LoginPage() {
           <Typography variant="h4" gutterBottom>
             Login
           </Typography>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 2 }}>Login successful!</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Login successful!
+            </Alert>
+          )}
           <form onSubmit={handleSubmit}>
             <TextField
               label="Username"
@@ -71,28 +79,14 @@ function LoginPage() {
               variant="outlined"
               sx={{ backgroundColor: "white" }}
             />
-            <Button 
-              type="submit" 
-              variant="contained" 
-              color="primary" 
-              fullWidth 
-              sx={{ mt: 2 }}
-            >
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
               Login
             </Button>
-            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-              <Button 
-                variant="text" 
-                color="primary" 
-                onClick={() => (window.location.href = "/forgot-password")}
-              >
+            <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+              <Button variant="text" color="primary" onClick={() => (window.location.href = "/forgot-password")}>
                 Forgot Password?
               </Button>
-              <Button 
-                variant="text" 
-                color="primary" 
-                onClick={() => (window.location.href = "/register")}
-              >
+              <Button variant="text" color="primary" onClick={() => (window.location.href = "/register")}>
                 Create Account
               </Button>
             </Box>

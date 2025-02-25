@@ -60,9 +60,7 @@ const FareInputComponent = () => {
           end_lon: lng,
         });
 
-        const apiResponse = await fetch(
-          `http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`
-        );
+        const apiResponse = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`);
 
         if (!apiResponse.ok) {
           throw new Error("API call failed");

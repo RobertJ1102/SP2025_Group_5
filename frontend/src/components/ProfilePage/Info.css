@@ -1,6 +1,6 @@
 /* frontend/src/components/ProfilePage/Info.css */
 
-.info-container {
+.container {
     padding: 30px;
     background-color: #f9f9f9;
     border-radius: 8px;
@@ -10,17 +10,17 @@
     gap: 20px;
   }
   
-  .info-title {
+  .title {
     margin-bottom: 24px;
     color: #333;
   }
   
-  .info-detail {
+  .detail {
     margin-bottom: 20px;
     color: #555;
   }
 
-  .info-button {
+  .button {
     margin-top: 20px;
     align-self: flex-start;
   }

@@ -31,6 +31,7 @@ class Address(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     written_address = Column(String(255))
+    final_address = Column(String(255))
     longitude = Column(String(50))
     latitude = Column(String(50))
     timestamp = Column(DateTime, default=datetime.now)

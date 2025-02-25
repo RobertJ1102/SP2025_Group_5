@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "ol/ol.css"; // OpenLayers default styles
 import Map from "ol/Map.js";
 import View from "ol/View.js";
@@ -8,77 +8,146 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
+import { fromLonLat, toLonLat } from "ol/proj";
+import { Style, Stroke, Fill, Circle as CircleStyle } from "ol/style";
 import { circular } from "ol/geom/Polygon";
-import { fromLonLat } from "ol/proj";
-import useUserLocation from "../hooks/useUserLocation";
 
-const MapComponent = () => {
+const MapComponent = ({ activeSelection, onSetPickup, onSetDestination }) => {
+  // activeSelection should be either "pickup" or "destination"
   const mapRef = useRef(null);
-  // Keep a ref for the vector source so we can update it without recreating it.
   const vectorSourceRef = useRef(null);
+  const [map, setMap] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [pickupPoint, setPickupPoint] = useState(null);
+  const [destinationPoint, setDestinationPoint] = useState(null);
 
-  // Get location info from our custom hook.
-  const { location, accuracy, error } = useUserLocation();
-
-  // Initialize the map only once on mount.
+  // Initialize the map
   useEffect(() => {
     const osmLayer = new TileLayer({
       preload: Infinity,
       source: new OSM(),
     });
 
-    // Create a vector source and store it in a ref.
     const vectorSource = new VectorSource();
     vectorSourceRef.current = vectorSource;
     const vectorLayer = new VectorLayer({
       source: vectorSource,
     });
 
-    const map = new Map({
+    const initialView = new View({
+      center: fromLonLat([0, 0]),
+      zoom: 2,
+    });
+
+    const mapObject = new Map({
       target: mapRef.current,
       layers: [osmLayer, vectorLayer],
-      view: new View({
-        center: [0, 0],
-        zoom: 2,
-      }),
+      view: initialView,
+    });
+
+    setMap(mapObject);
+
+    // Add click listener to set pickup or destination point
+    mapObject.on("click", (event) => {
+      const coordinate = event.coordinate;
+      // Convert coordinate to longitude/latitude
+      const lonLat = toLonLat(coordinate);
+      if (activeSelection === "pickup") {
+        setPickupPoint(coordinate);
+        if (onSetPickup) onSetPickup(lonLat);
+      } else if (activeSelection === "destination") {
+        setDestinationPoint(coordinate);
+        if (onSetDestination) onSetDestination(lonLat);
+      }
     });
 
     return () => {
-      map.setTarget(null);
+      mapObject.setTarget(null);
     };
-  }, []);
+  }, [activeSelection, onSetPickup, onSetDestination]);
 
-  // Update map features whenever location or accuracy changes.
+  // Get user location and zoom in
   useEffect(() => {
-    if (location && accuracy && vectorSourceRef.current) {
-      // Create a circular geometry for the accuracy circle.
-      const circleGeom = circular(location, accuracy);
-      // Transform the circle from EPSG:4326 (lon/lat) to the map projection (usually EPSG:3857).
-      circleGeom.transform("EPSG:4326", "EPSG:3857");
-
-      // Create a point feature using fromLonLat to transform location.
-      const pointGeom = new Point(fromLonLat(location));
-
-      // Clear and update the features.
-      vectorSourceRef.current.clear(true);
-      vectorSourceRef.current.addFeatures([
-        new Feature(circleGeom),
-        new Feature(pointGeom),
-      ]);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const coords = [longitude, latitude];
+          setUserLocation(coords);
+          if (map) {
+            const view = map.getView();
+            view.setCenter(fromLonLat(coords));
+            view.setZoom(15);
+          }
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
     }
-  }, [location, accuracy]);
+  }, [map]);
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  // Update vector layer features when any point changes
+  useEffect(() => {
+    if (vectorSourceRef.current && userLocation) {
+      vectorSourceRef.current.clear(true);
 
-  return (
-    <div
-      style={{ width: "100%", height: "100%" }}
-      ref={mapRef}
-      className="map-container"
-    ></div>
-  );
+      // Create a circle in EPSG:3857 coordinates
+      // Convert userLocation to EPSG:3857 first
+      const center3857 = fromLonLat(userLocation);
+      // Use a fixed radius of 9 meters (approx. 30ft)
+      const radius = 9;
+      const circleGeom = circular(center3857, radius, 64);
+      // No need to transform since center3857 is already in EPSG:3857
+
+      const circleFeature = new Feature(circleGeom);
+      circleFeature.setStyle(
+        new Style({
+          stroke: new Stroke({
+            color: "rgba(0, 0, 255, 0.5)",
+            width: 2,
+          }),
+          fill: new Fill({
+            color: "rgba(0, 0, 255, 0.1)",
+          }),
+        })
+      );
+      vectorSourceRef.current.addFeature(circleFeature);
+
+      // Pickup Marker
+      if (pickupPoint) {
+        const pickupFeature = new Feature(new Point(pickupPoint));
+        pickupFeature.setStyle(
+          new Style({
+            image: new CircleStyle({
+              radius: 7,
+              fill: new Fill({ color: "green" }),
+              stroke: new Stroke({ color: "white", width: 2 }),
+            }),
+          })
+        );
+        vectorSourceRef.current.addFeature(pickupFeature);
+      }
+
+      // Destination Marker
+      if (destinationPoint) {
+        const destFeature = new Feature(new Point(destinationPoint));
+        destFeature.setStyle(
+          new Style({
+            image: new CircleStyle({
+              radius: 7,
+              fill: new Fill({ color: "red" }),
+              stroke: new Stroke({ color: "white", width: 2 }),
+            }),
+          })
+        );
+        vectorSourceRef.current.addFeature(destFeature);
+      }
+    }
+  }, [userLocation, pickupPoint, destinationPoint]);
+
+  return <div ref={mapRef} style={{ width: "100%", height: "300px" }} />;
 };
 
 export default MapComponent;

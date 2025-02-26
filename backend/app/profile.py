@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from .database import get_db
 from .config import SECRET_KEY
 from itsdangerous import URLSafeTimedSerializer
-from .models import User
+from .models import User, Address
 from .auth import verify_session  # Assuming verify_session is a function in auth.py
 
 router = APIRouter()
@@ -69,4 +69,93 @@ def update_user_info(
         "first_name": user.first_name,
         "last_name": user.last_name,
         "home_address": user.home_address
+    }
+
+@router.get("/history")
+def get_user_history(request: Request, db: Session = Depends(get_db)):
+    """Fetch user address history using session token."""
+    # Extract session token from cookies
+    session_token = request.cookies.get("session")
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Verify session to get the username
+    username = verify_session(session_token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+    # Query the database for user information
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Fetch the user's address history
+    address_history = db.query(Address).filter(Address.user_id == user.id).all()
+
+    # Format the response
+    history_data = [
+        {
+            "address": address.final_address,
+            "timestamp": address.timestamp
+        }
+        for address in address_history
+    ]
+
+    return history_data
+
+@router.get("/preferences")
+def get_user_preferences(request: Request, db: Session = Depends(get_db)):
+    """Fetch user preferences using session token."""
+    # Extract session token from cookies
+    session_token = request.cookies.get("session")
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Verify session to get the username
+    username = verify_session(session_token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+    # Query the database for user preferences
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {
+        "search_range": user.search_range,
+        "price_range": user.max_price
+    }
+
+@router.put("/preferencesupdate")
+def update_user_preferences(
+    request: Request,
+    db: Session = Depends(get_db),
+    preferences_data: dict = Body(...)
+):
+    """Update user preferences using session token."""
+    # Extract session token from cookies
+    session_token = request.cookies.get("session")
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Verify session to get the username
+    username = verify_session(session_token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+    # Query the database for the user
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Update user preferences
+    user.search_range = preferences_data.get("search_range", user.search_range)
+    user.max_price = preferences_data.get("price_range", user.max_price)
+
+    # Commit changes to the database
+    db.commit()
+
+    return {
+        "search_range": user.search_range,
+        "price_range": user.max_price
     }

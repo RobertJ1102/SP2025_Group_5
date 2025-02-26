@@ -79,8 +79,8 @@ function Info() {
   }
 
   return (
-    <Box className="info-container">
-      <Typography variant="h4" className="info-title">User Information</Typography>
+    <Box className="container">
+      <Typography variant="h4" className="title">User Information</Typography>
       {isEditing ? (
         <div className="text-field-container">
           <TextField
@@ -88,34 +88,34 @@ function Info() {
             name="first_name"
             value={editData.first_name}
             onChange={handleInputChange}
-            className="info-detail"
+            className="detail"
           />
           <TextField
             label="Last Name"
             name="last_name"
             value={editData.last_name}
             onChange={handleInputChange}
-            className="info-detail"
+            className="detail"
           />
           <TextField
             label="Home Address"
             name="home_address"
             value={editData.home_address}
             onChange={handleInputChange}
-            className="info-detail"
+            className="detail"
           />
-          <Button variant="contained" color="primary" onClick={handleSave} className="info-button">
+          <Button variant="contained" color="primary" onClick={handleSave} className="button">
             Save
           </Button>
         </div>
       ) : (
         <>
-          <Typography variant="body1" className="info-detail">First Name: {userInfo.first_name}</Typography>
-          <Typography variant="body1" className="info-detail">Last Name: {userInfo.last_name}</Typography>
-          <Typography variant="body1" className="info-detail">Home Address: {userInfo.home_address}</Typography>
-          <Button variant="outlined" onClick={handleEditToggle} className="info-button">
+          <Typography variant="body1" className="detail">First Name: {userInfo.first_name}</Typography>
+          <Typography variant="body1" className="detail">Last Name: {userInfo.last_name}</Typography>
+          <Typography variant="body1" className="detail">Home Address: {userInfo.home_address}</Typography>
+          <Button variant="outlined" onClick={handleEditToggle} className="button">  
             Edit
-          </Button>
+          </Button> 
         </>
       )}
     </Box>

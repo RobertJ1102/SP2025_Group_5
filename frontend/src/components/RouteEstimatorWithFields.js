@@ -5,7 +5,7 @@ import useUserLocation from "../hooks/useUserLocation";
 import { setKey, fromLatLng, fromAddress } from "react-geocode";
 
 // Set your Google API key.
-setKey("AIzaSyC8Vrp8rhcNWAN9IJJfuZZ_5reIRaFfSU4");
+setKey("");
 
 const RouteEstimatorWithFields = () => {
   const { location, error } = useUserLocation();
@@ -114,7 +114,7 @@ const RouteEstimatorWithFields = () => {
       return;
     }
     // Replace these with your actual values.
-    const CLIENT_ID = "QQFB2_v9dmmR9vnOq7BC7cTTAesOdHM4erouwgAk";
+    const CLIENT_ID = "";
     const PRODUCT_ID = "2d1d002b-d4d0-4411-98e1-673b244878b2"; // sample product id
 
     const pickupData = {

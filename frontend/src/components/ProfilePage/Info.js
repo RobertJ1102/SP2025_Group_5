@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Box, Button, TextField } from '@mui/material';
-import './Info.css';
+import React, { useEffect, useState } from "react";
+import { Typography, Box, Button, TextField } from "@mui/material";
+import "./Info.css";
 
 function Info() {
   const [userInfo, setUserInfo] = useState(null);
@@ -12,23 +12,23 @@ function Info() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/profile/info', {
-          method: 'GET',
-          credentials: 'include', // Include cookies in the request
+        const response = await fetch("http://127.0.0.1:8000/profile/info", {
+          method: "GET",
+          credentials: "include", // Include cookies in the request
         });
 
-        console.log('Response:', response); // Debug and show entire response in console
+        console.log("Response:", response); // Debug and show entire response in console
 
         if (!response.ok) {
-          throw new Error('Failed to fetch user information');
+          throw new Error("Failed to fetch user information");
         }
 
         const data = await response.json();
-        console.log('Data:', data); // Debug and show entire response data in console
+        console.log("Data:", data); // Debug and show entire response data in console
         setUserInfo(data);
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching user info:', err);
+        console.error("Error fetching user info:", err);
       } finally {
         setLoading(false);
       }
@@ -49,17 +49,17 @@ function Info() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/profile/infoupdate', {
-        method: 'PUT',
+      const response = await fetch("http://127.0.0.1:8000/profile/infoupdate", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(editData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update user information');
+        throw new Error("Failed to update user information");
       }
 
       const updatedData = await response.json();
@@ -79,8 +79,8 @@ function Info() {
   }
 
   return (
-    <Box className="container">
-      <Typography variant="h4" className="title">User Information</Typography>
+    <Box className="info-container">
+      <Typography variant="h4" className="info-title">User Information</Typography>
       {isEditing ? (
         <div className="text-field-container">
           <TextField
@@ -110,10 +110,10 @@ function Info() {
         </div>
       ) : (
         <>
-          <Typography variant="body1" className="detail">First Name: {userInfo.first_name}</Typography>
-          <Typography variant="body1" className="detail">Last Name: {userInfo.last_name}</Typography>
-          <Typography variant="body1" className="detail">Home Address: {userInfo.home_address}</Typography>
-          <Button variant="outlined" onClick={handleEditToggle} className="button">  
+          <Typography variant="body1" className="info-detail">First Name: {userInfo.first_name}</Typography>
+          <Typography variant="body1" className="info-detail">Last Name: {userInfo.last_name}</Typography>
+          <Typography variant="body1" className="info-detail">Home Address: {userInfo.home_address}</Typography>
+          <Button variant="outlined" onClick={handleEditToggle} className="info-button">
             Edit
           </Button> 
         </>

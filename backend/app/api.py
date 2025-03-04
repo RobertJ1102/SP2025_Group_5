@@ -59,9 +59,9 @@ def get_price_estimates(start_latitude: float, start_longitude: float,
 
     # Define base fare and per km rates for each product
     products = [
-        {"display_name": "UberX", "base_fare": 2.0, "per_km": 1.0, "product_id": "uberx123"},
-        {"display_name": "UberXL", "base_fare": 3.0, "per_km": 1.5, "product_id": "uberxl123"},
-        {"display_name": "Uber Black", "base_fare": 5.0, "per_km": 2.5,
+        {"display_name": "UberX", "base_fare": 6.0, "per_km": 2.5, "product_id": "uberx123"},
+        {"display_name": "UberXL", "base_fare": 7.0, "per_km": 3.5, "product_id": "uberxl123"},
+        {"display_name": "Uber Black", "base_fare": 9.0, "per_km": 4.5,
                                          "product_id": "uberblack123"},
     ]
 

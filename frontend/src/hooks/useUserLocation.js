@@ -10,33 +10,19 @@ const useUserLocation = () => {
       setError("Geolocation is not supported by your browser");
       return;
     }
+
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const coords = [position.coords.longitude, position.coords.latitude];
-        const accuracy = position.coords.accuracy;
         setLocation(coords);
-        setAccuracy(accuracy);
-
-        fetch("/api/update-location", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(coords),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Location updated on backend:", data);
-          })
-          .catch((err) => {
-            console.error("Error updating backend:", err);
-          });
+        setAccuracy(position.coords.accuracy);
       },
       (err) => {
         setError(err.message);
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
+
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };

@@ -136,7 +136,7 @@ const RouteEstimatorWithFields = () => {
       `&drop[0]=${encodeURIComponent(JSON.stringify(dropData))}` +
       `&product_id=${PRODUCT_ID}`;
 
-    window.location.href = uberDeepLink;
+    window.open(uberDeepLink, "_blank");
   };
 
   if (error) {

@@ -1,9 +1,9 @@
 # backend/app/profile.py
 from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from sqlalchemy.orm import Session
+from itsdangerous import URLSafeTimedSerializer
 from .database import get_db
 from .config import SECRET_KEY
-from itsdangerous import URLSafeTimedSerializer
 from .models import User, Address
 from .auth import verify_session  # Assuming verify_session is a function in auth.py
 

@@ -6,6 +6,7 @@ from .database import get_db
 from .config import SECRET_KEY
 from .models import User, Address
 from .auth import verify_session  # Assuming verify_session is a function in auth.py
+from datetime import datetime
 
 router = APIRouter()
 serializer = URLSafeTimedSerializer(SECRET_KEY)
@@ -159,3 +160,44 @@ def update_user_preferences(
         "search_range": user.search_range,
         "price_range": user.max_price
     }
+
+@router.post("/history/add")
+def add_user_history(
+    request: Request,
+    db: Session = Depends(get_db),
+    address_data: dict = Body(...)
+):
+    """Add a new entry to the user's address history using session token."""
+    # Extract session token from cookies
+    session_token = request.cookies.get("session")
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Verify session to get the username
+    username = verify_session(session_token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+    # Query the database for the user
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Create a new address entry
+    new_address = Address(
+        user_id=user.id,
+        written_address=address_data.get("written_address"),
+        final_address=address_data.get("final_address"),
+        longitude_start=address_data.get("longitude_start"),
+        latitude_start=address_data.get("latitude_start"),
+        longitude_end=address_data.get("longitude_end"),
+        latitude_end=address_data.get("latitude_end"),
+        timestamp=datetime.now()
+    )
+
+    # Add the new address to the session and commit
+    db.add(new_address)
+    db.commit()
+
+    return {"message": "Address history entry added successfully"}
+

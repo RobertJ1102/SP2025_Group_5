@@ -28,8 +28,18 @@ function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(true);
-        setTimeout(() => (window.location.href = "/"), 1000);
+        localStorage.setItem("token", data.access_token);
+        
+        // Check if user just registered
+        const isNewUser = localStorage.getItem("newlyRegistered");
+        if (isNewUser) {
+          // Remove the flag so it doesn't show again
+          localStorage.removeItem("newlyRegistered");
+          // Set a flag for HomePage to show welcome message
+          sessionStorage.setItem("showWelcome", "true");
+        }
+        
+        window.location.href = "/";
       } else {
         const errorDetail = data.detail || "Login failed";
         setError(typeof errorDetail === "string" ? errorDetail : JSON.stringify(errorDetail));

@@ -1,7 +1,7 @@
 """This module contains the SQLAlchemy model for the User table."""
 from typing import List
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel
 from .database import Base
@@ -18,8 +18,8 @@ class User(Base):
     first_name = Column(String(50), default="")
     last_name = Column(String(50), default="")
     home_address = Column(String(255), default="")
-    home_longitude = Column(String(50), default="")
-    home_latitude = Column(String(50), default="")
+    home_longitude = Column(Float, default=0.0)
+    home_latitude = Column(Float, default=0.0)
     search_range = Column(Integer, default=400)  # Search range in feet
     max_price = Column(Integer, default=50)  # Maximum price willing to pay
 
@@ -33,8 +33,10 @@ class Address(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     written_address = Column(String(255))
     final_address = Column(String(255))
-    longitude = Column(String(50))
-    latitude = Column(String(50))
+    longitude_start = Column(Float)
+    latitude_start = Column(Float)
+    longitude_end = Column(Float)
+    latitude_end = Column(Float)
     timestamp = Column(DateTime, default=datetime.now)
 
     user = relationship("User", back_populates="addresses")

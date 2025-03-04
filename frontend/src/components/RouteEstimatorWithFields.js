@@ -5,7 +5,7 @@ import useUserLocation from "../hooks/useUserLocation";
 import { setKey, fromLatLng, fromAddress } from "react-geocode";
 
 // Set your Google API key.
-setKey("");
+setKey("AIzaSyC8_U5YDsG3xTgfprFgDV2L7yKONR4-VL8");
 
 const RouteEstimatorWithFields = () => {
   const { location, error } = useUserLocation();
@@ -107,14 +107,45 @@ const RouteEstimatorWithFields = () => {
     setLoading(false);
   };
 
-  // Generate and open Uber deep link.
+  const addRouteToHistory = async () => {
+    if (!pickupCoordinates || !destinationCoordinates) {
+      console.error("Both pickup and destination must be set to add to history");
+      return;
+    }
+
+    const addressData = {
+      written_address: pickupAddress,
+      final_address: destinationAddress,
+      longitude_start: pickupCoordinates.lng,
+      latitude_start: pickupCoordinates.lat,
+      longitude_end: destinationCoordinates.lng,
+      latitude_end: destinationCoordinates.lat,
+    };
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/profile/history/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include',
+        body: JSON.stringify(addressData),
+      });
+
+      if (!response.ok) throw new Error("Failed to add route to history");
+      console.log("Route added to history successfully");
+    } catch (err) {
+      console.error("Error adding route to history:", err);
+    }
+  };
+
   const handleOpenUber = () => {
     if (!pickupCoordinates || !destinationCoordinates) {
       console.error("Both pickup and destination must be set to open in Uber");
       return;
     }
     // Replace these with your actual values.
-    const CLIENT_ID = "";
+    const CLIENT_ID = "bGx0iZIMpiDhwEoOIQX_CZNek5LBJoAfBej5JmEJ";
     const PRODUCT_ID = "2d1d002b-d4d0-4411-98e1-673b244878b2"; // sample product id
 
     const pickupData = {
@@ -137,6 +168,11 @@ const RouteEstimatorWithFields = () => {
       `&product_id=${PRODUCT_ID}`;
 
     window.open(uberDeepLink, "_blank");
+  };
+
+  const handleOpenUberAndAddHistory = () => {
+    handleOpenUber();
+    addRouteToHistory();
   };
 
   if (error) {
@@ -215,7 +251,7 @@ const RouteEstimatorWithFields = () => {
           </Box>
         )}
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" fullWidth onClick={handleOpenUber}>
+          <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
             Open in Uber
           </Button>
         </Box>

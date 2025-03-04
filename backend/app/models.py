@@ -1,11 +1,10 @@
 """This module contains the SQLAlchemy model for the User table."""
+from typing import List
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from typing import List
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String
 from .database import Base
-from datetime import datetime
 
 # pylint: disable=too-few-public-methods
 class User(Base):

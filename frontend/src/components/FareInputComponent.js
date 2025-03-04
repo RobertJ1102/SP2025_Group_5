@@ -3,7 +3,7 @@ import { TextField, Button, Box, Typography, Paper } from "@mui/material";
 import { setKey, fromAddress, fromLatLng } from "react-geocode";
 
 // Set your Google API key for geocoding
-setKey("AIzaSyC8Vrp8rhcNWAN9IJJfuZZ_5reIRaFfSU4");
+setKey("AIzaSyDW7FcjHO4DUj7wVzVSGXGOCcNpEDVrovY");
 
 const FareInputComponent = () => {
   const [pickupAddress, setPickupAddress] = useState("");

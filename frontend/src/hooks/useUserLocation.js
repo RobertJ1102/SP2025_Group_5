@@ -20,7 +20,7 @@ const useUserLocation = () => {
       (err) => {
         setError(err.message);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, maximumAge: 0 }
     );
 
     return () => {

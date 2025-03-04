@@ -5,7 +5,7 @@ import useUserLocation from "../hooks/useUserLocation";
 import { setKey, fromLatLng, fromAddress } from "react-geocode";
 
 // Set your Google API key.
-setKey("AIzaSyC8_U5YDsG3xTgfprFgDV2L7yKONR4-VL8");
+setKey("AIzaSyDW7FcjHO4DUj7wVzVSGXGOCcNpEDVrovY");
 
 const RouteEstimatorWithFields = () => {
   const { location, error } = useUserLocation();
@@ -128,7 +128,7 @@ const RouteEstimatorWithFields = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(addressData),
       });
 
@@ -180,12 +180,12 @@ const RouteEstimatorWithFields = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 8, mb: 8 }}>
       <Paper elevation={3} sx={{ p: 2 }}>
         <Typography variant="h5" align="center" gutterBottom>
           Route Estimator
         </Typography>
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 3 }}>
           <TextField
             label="Pickup Location"
             fullWidth
@@ -194,7 +194,7 @@ const RouteEstimatorWithFields = () => {
             onBlur={updatePickupFromText}
           />
         </Box>
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 3 }}>
           <TextField
             label="Destination Location"
             fullWidth
@@ -203,7 +203,7 @@ const RouteEstimatorWithFields = () => {
             onBlur={updateDestinationFromText}
           />
         </Box>
-        <Box sx={{ width: "100%", height: "300px", mb: 2 }}>
+        <Box sx={{ width: "100%", height: "500px", mb: 3 }}>
           <MapComponent
             activeSelection={activeSelection}
             onSetPickup={handleSetPickup}
@@ -215,7 +215,7 @@ const RouteEstimatorWithFields = () => {
             destinationPoint={destinationCoordinates}
           />
         </Box>
-        <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-around", mb: 3 }}>
           <Button
             variant={activeSelection === "pickup" ? "contained" : "outlined"}
             onClick={() => setActiveSelection("pickup")}

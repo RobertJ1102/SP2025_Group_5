@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Typography, Box, Button, TextField } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import "./Info.css";
 
 function Info() {
@@ -8,6 +9,7 @@ function Info() {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -113,9 +115,18 @@ function Info() {
           <Typography variant="body1" className="info-detail">First Name: {userInfo.first_name}</Typography>
           <Typography variant="body1" className="info-detail">Last Name: {userInfo.last_name}</Typography>
           <Typography variant="body1" className="info-detail">Home Address: {userInfo.home_address}</Typography>
-          <Button variant="outlined" onClick={handleEditToggle} className="info-button">
-            Edit
-          </Button> 
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Button variant="outlined" onClick={handleEditToggle} className="info-button">
+              Edit
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => navigate('/change-password')}
+            >
+              Change Password
+            </Button>
+          </Box>
         </>
       )}
     </Box>

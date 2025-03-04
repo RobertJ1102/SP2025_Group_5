@@ -33,6 +33,7 @@ function CreateAccountPage() {
       const data = await response.json();
       if (response.ok) {
         setSuccess(true);
+        localStorage.setItem("newlyRegistered", "true");
         setTimeout(() => (window.location.href = "/"), 1000);
       } else {
         setError(data.detail || "Registration failed.");

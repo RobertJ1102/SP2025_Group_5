@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 function Header({ onLogout }) {
@@ -23,6 +23,16 @@ function Header({ onLogout }) {
       right: 0
     }}>
       <Toolbar>
+        <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+          <img 
+            src="/logo.png" 
+            alt="FareFinder Logo" 
+            style={{ 
+              height: '40px',
+              marginRight: '10px'
+            }}
+          />
+        </Box>
         <Button color="inherit" onClick={handleHomeClick}>
           Home
         </Button>

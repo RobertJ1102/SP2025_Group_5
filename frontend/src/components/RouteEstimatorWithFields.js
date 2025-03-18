@@ -5,7 +5,7 @@ import useUserLocation from "../hooks/useUserLocation";
 import { setKey, fromLatLng, fromAddress } from "react-geocode";
 
 // Set your Google API key.
-setKey("");
+setKey("AIzaSyDW7FcjHO4DUj7wVzVSGXGOCcNpEDVrovY");
 
 const RouteEstimatorWithFields = () => {
   const { location, error } = useUserLocation();
@@ -107,14 +107,45 @@ const RouteEstimatorWithFields = () => {
     setLoading(false);
   };
 
-  // Generate and open Uber deep link.
+  const addRouteToHistory = async () => {
+    if (!pickupCoordinates || !destinationCoordinates) {
+      console.error("Both pickup and destination must be set to add to history");
+      return;
+    }
+
+    const addressData = {
+      written_address: pickupAddress,
+      final_address: destinationAddress,
+      longitude_start: pickupCoordinates.lng,
+      latitude_start: pickupCoordinates.lat,
+      longitude_end: destinationCoordinates.lng,
+      latitude_end: destinationCoordinates.lat,
+    };
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/profile/history/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(addressData),
+      });
+
+      if (!response.ok) throw new Error("Failed to add route to history");
+      console.log("Route added to history successfully");
+    } catch (err) {
+      console.error("Error adding route to history:", err);
+    }
+  };
+
   const handleOpenUber = () => {
     if (!pickupCoordinates || !destinationCoordinates) {
       console.error("Both pickup and destination must be set to open in Uber");
       return;
     }
     // Replace these with your actual values.
-    const CLIENT_ID = "";
+    const CLIENT_ID = "bGx0iZIMpiDhwEoOIQX_CZNek5LBJoAfBej5JmEJ";
     const PRODUCT_ID = "2d1d002b-d4d0-4411-98e1-673b244878b2"; // sample product id
 
     const pickupData = {
@@ -139,17 +170,22 @@ const RouteEstimatorWithFields = () => {
     window.open(uberDeepLink, "_blank");
   };
 
+  const handleOpenUberAndAddHistory = () => {
+    handleOpenUber();
+    addRouteToHistory();
+  };
+
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 8, mb: 8 }}>
       <Paper elevation={3} sx={{ p: 2 }}>
         <Typography variant="h5" align="center" gutterBottom>
           Route Estimator
         </Typography>
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 3 }}>
           <TextField
             label="Pickup Location"
             fullWidth
@@ -158,7 +194,7 @@ const RouteEstimatorWithFields = () => {
             onBlur={updatePickupFromText}
           />
         </Box>
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 3 }}>
           <TextField
             label="Destination Location"
             fullWidth
@@ -167,7 +203,7 @@ const RouteEstimatorWithFields = () => {
             onBlur={updateDestinationFromText}
           />
         </Box>
-        <Box sx={{ width: "100%", height: "300px", mb: 2 }}>
+        <Box sx={{ width: "100%", height: "500px", mb: 3 }}>
           <MapComponent
             activeSelection={activeSelection}
             onSetPickup={handleSetPickup}
@@ -179,7 +215,7 @@ const RouteEstimatorWithFields = () => {
             destinationPoint={destinationCoordinates}
           />
         </Box>
-        <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-around", mb: 3 }}>
           <Button
             variant={activeSelection === "pickup" ? "contained" : "outlined"}
             onClick={() => setActiveSelection("pickup")}
@@ -215,7 +251,7 @@ const RouteEstimatorWithFields = () => {
           </Box>
         )}
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" fullWidth onClick={handleOpenUber}>
+          <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
             Open in Uber
           </Button>
         </Box>

@@ -31,6 +31,11 @@ def register(user: UserCreate, response: Response, db: Session = Depends(get_db)
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    # Check if username exists
+    existing_username = db.query(User).filter(User.username == user.username).first()
+    if existing_username:
+        raise HTTPException(status_code=400, detail="Username already taken")
+
     # Create new user
     new_user = User(username=user.username, email=user.email, password=hash_password(user.password))
     db.add(new_user)

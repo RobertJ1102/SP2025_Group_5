@@ -64,7 +64,7 @@ services:
 volumes:
   db-data:
 
-# Custom Docker Network (Avoids Conflicts)
+# Custom Docker Network
 networks:
   farefinder-network:
     driver: bridge

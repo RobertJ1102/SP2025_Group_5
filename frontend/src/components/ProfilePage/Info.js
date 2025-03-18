@@ -81,8 +81,8 @@ function Info() {
   }
 
   return (
-    <Box className="info-container">
-      <Typography variant="h4" className="info-title">User Information</Typography>
+    <Box className="container">
+      <Typography variant="h4" className="title">User Information</Typography>
       {isEditing ? (
         <div className="text-field-container">
           <TextField

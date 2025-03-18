@@ -16,30 +16,45 @@ const MapComponent = ({
   activeSelection,
   onSetPickup,
   onSetDestination,
-  currentLocation, // object { lat, lng } for the user's current location
-  pickupPoint, // object { lat, lng } for the pickup marker
-  destinationPoint, // object { lat, lng } for the destination marker
+  currentLocation, // { lat, lng }
+  pickupPoint, // { lat, lng }
+  destinationPoint, // { lat, lng }
 }) => {
   const mapRef = useRef(null);
-  const vectorSourceRef = useRef(null);
+  const currentLocationSourceRef = useRef(null);
+  const markerSourceRef = useRef(null);
   const [map, setMap] = useState(null);
 
-  // Initialize the map only once.
+  // Use a ref to store activeSelection so that the click handler always gets the latest value.
+  const activeSelectionRef = useRef(activeSelection);
+  useEffect(() => {
+    activeSelectionRef.current = activeSelection;
+  }, [activeSelection]);
+
+  // Initialize the map and two vector layers only once.
   useEffect(() => {
     const osmLayer = new TileLayer({
       preload: Infinity,
       source: new OSM(),
     });
 
-    const vectorSource = new VectorSource();
-    vectorSourceRef.current = vectorSource;
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
+    // Current location layer (blue dot and circle)
+    const currentLocationSource = new VectorSource();
+    currentLocationSourceRef.current = currentLocationSource;
+    const currentLocationLayer = new VectorLayer({
+      source: currentLocationSource,
+    });
+
+    // Marker layer for pickup/destination
+    const markerSource = new VectorSource();
+    markerSourceRef.current = markerSource;
+    const markerLayer = new VectorLayer({
+      source: markerSource,
     });
 
     const mapObject = new Map({
       target: mapRef.current,
-      layers: [osmLayer, vectorLayer],
+      layers: [osmLayer, currentLocationLayer, markerLayer],
       view: new View({
         center: fromLonLat([0, 0]),
         zoom: 2,
@@ -47,13 +62,13 @@ const MapComponent = ({
     });
     setMap(mapObject);
 
-    // Add click listener to set pickup or destination by map.
+    // Add click listener once.
     mapObject.on("click", (event) => {
       const coordinate = event.coordinate;
       const lonLat = toLonLat(coordinate);
-      if (activeSelection === "pickup") {
+      if (activeSelectionRef.current === "pickup") {
         if (onSetPickup) onSetPickup(lonLat);
-      } else if (activeSelection === "destination") {
+      } else if (activeSelectionRef.current === "destination") {
         if (onSetDestination) onSetDestination(lonLat);
       }
     });
@@ -61,18 +76,16 @@ const MapComponent = ({
     return () => {
       mapObject.setTarget(null);
     };
-  }, [activeSelection, onSetPickup, onSetDestination]);
+  }, []); // Note: empty dependency array so the map is created only once
 
-  // Update features whenever current location, pickup, or destination change.
+  // Update the current location layer (blue dot and circle) whenever currentLocation changes.
   useEffect(() => {
-    if (vectorSourceRef.current && currentLocation) {
-      vectorSourceRef.current.clear(true);
+    if (currentLocationSourceRef.current && currentLocation) {
+      const currentLocationSource = currentLocationSourceRef.current;
+      currentLocationSource.clear(true);
 
-      // Convert current location to map projection.
       const currentCenter = fromLonLat([currentLocation.lng, currentLocation.lat]);
-
-      // Create a fixed circle with a radius of 9 meters (~30ft).
-      const fixedRadius = 9;
+      const fixedRadius = 9; // 9 meters ~ 30ft.
       const circleGeom = circular(currentCenter, fixedRadius, 64);
       const circleFeature = new Feature(circleGeom);
       circleFeature.setStyle(
@@ -87,7 +100,6 @@ const MapComponent = ({
         })
       );
 
-      // Create a dot for the user's current location.
       const dotFeature = new Feature(new Point(currentCenter));
       dotFeature.setStyle(
         new Style({
@@ -99,10 +111,16 @@ const MapComponent = ({
         })
       );
 
-      // Add current location features.
-      vectorSourceRef.current.addFeatures([circleFeature, dotFeature]);
+      currentLocationSource.addFeatures([circleFeature, dotFeature]);
+    }
+  }, [currentLocation]);
 
-      // Add pickup marker if it exists.
+  // Update marker layer for pickup and destination markers.
+  useEffect(() => {
+    if (markerSourceRef.current) {
+      const markerSource = markerSourceRef.current;
+      markerSource.clear(true);
+
       if (pickupPoint) {
         const pickupCoord = fromLonLat([pickupPoint.lng, pickupPoint.lat]);
         const pickupFeature = new Feature(new Point(pickupCoord));
@@ -115,10 +133,9 @@ const MapComponent = ({
             }),
           })
         );
-        vectorSourceRef.current.addFeature(pickupFeature);
+        markerSource.addFeature(pickupFeature);
       }
 
-      // Add destination marker if it exists.
       if (destinationPoint) {
         const destCoord = fromLonLat([destinationPoint.lng, destinationPoint.lat]);
         const destFeature = new Feature(new Point(destCoord));
@@ -131,10 +148,10 @@ const MapComponent = ({
             }),
           })
         );
-        vectorSourceRef.current.addFeature(destFeature);
+        markerSource.addFeature(destFeature);
       }
     }
-  }, [currentLocation, pickupPoint, destinationPoint]);
+  }, [pickupPoint, destinationPoint]);
 
   // When current location is available, zoom in.
   useEffect(() => {
@@ -145,7 +162,7 @@ const MapComponent = ({
     }
   }, [currentLocation, map]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "300px" }} />;
+  return <div ref={mapRef} style={{ width: "100%", height: "500px" }} />;
 };
 
 export default MapComponent;

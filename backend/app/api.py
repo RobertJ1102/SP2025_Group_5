@@ -1,7 +1,7 @@
 """ Main API router """
+from math import radians, sin, cos, sqrt, atan2
 import random
 import requests
-from math import radians, sin, cos, sqrt, atan2
 from fastapi import APIRouter, HTTPException
 from app.auth import router as auth_router
 from app.profile import router as profile_router

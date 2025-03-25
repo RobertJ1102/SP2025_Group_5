@@ -1,4 +1,6 @@
 # backend/app/profile.py
+"""Profile management routes."""
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from sqlalchemy.orm import Session
 from itsdangerous import URLSafeTimedSerializer
@@ -6,7 +8,7 @@ from .database import get_db
 from .config import SECRET_KEY
 from .models import User, Address
 from .auth import verify_session  # Assuming verify_session is a function in auth.py
-from datetime import datetime
+
 
 router = APIRouter()
 serializer = URLSafeTimedSerializer(SECRET_KEY)
@@ -201,4 +203,3 @@ def add_user_history(
     db.commit()
 
     return {"message": "Address history entry added successfully"}
-

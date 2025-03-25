@@ -17,7 +17,7 @@ const RouteEstimatorWithFields = () => {
   useEffect(() => {
     if (location) {
       // location from useUserLocation is an array: [lng, lat]
-      fetch(`http://127.0.0.1:8000/api/reverse_geocode?lat=${location[1]}&lng=${location[0]}`)
+      fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${location[1]}&lng=${location[0]}`)
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -32,7 +32,7 @@ const RouteEstimatorWithFields = () => {
   // Map callbacks (receiving [lng, lat] arrays)
   const handleSetPickup = (lonLat) => {
     setPickupCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fetch(`http://127.0.0.1:8000/api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+    fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
       .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
@@ -44,7 +44,7 @@ const RouteEstimatorWithFields = () => {
 
   const handleSetDestination = (lonLat) => {
     setDestinationCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fetch(`http://127.0.0.1:8000/api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+    fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
       .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
@@ -57,7 +57,7 @@ const RouteEstimatorWithFields = () => {
   // Update coordinates when text fields are blurred by using internal geocode endpoint.
   const updatePickupFromText = () => {
     if (pickupAddress) {
-      fetch(`http://127.0.0.1:8000/api/geocode?address=${encodeURIComponent(pickupAddress)}`)
+      fetch(`http://127.0.0.1:8000/geocode?address=${encodeURIComponent(pickupAddress)}`)
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -71,7 +71,7 @@ const RouteEstimatorWithFields = () => {
 
   const updateDestinationFromText = () => {
     if (destinationAddress) {
-      fetch(`http://127.0.0.1:8000/api/geocode?address=${encodeURIComponent(destinationAddress)}`)
+      fetch(`http://127.0.0.1:8000/geocode?address=${encodeURIComponent(destinationAddress)}`)
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {

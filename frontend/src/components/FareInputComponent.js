@@ -18,7 +18,7 @@ const FareInputComponent = () => {
           const { latitude, longitude } = position.coords;
           setPickupCoordinates({ lat: latitude, lng: longitude });
           try {
-            const response = await fetch(`http://127.0.0.1:8000/api/reverse_geocode?lat=${latitude}&lng=${longitude}`);
+            const response = await fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${latitude}&lng=${longitude}`);
             if (!response.ok) throw new Error("Failed to retrieve address");
             const data = await response.json();
             if (data.results && data.results[0]) {

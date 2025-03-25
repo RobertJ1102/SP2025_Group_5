@@ -20,7 +20,8 @@ function Header({ onLogout }) {
       marginRight: 'calc(-50vw + 50%)',
       top: 0,
       left: 0,
-      right: 0
+      right: 0,
+      background: 'linear-gradient(to bottom, #1a237e, #000000)'
     }}>
       <Toolbar>
         <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
@@ -33,14 +34,41 @@ function Header({ onLogout }) {
             }}
           />
         </Box>
-        <Button color="inherit" onClick={handleHomeClick}>
+        <Button 
+          color="inherit" 
+          onClick={handleHomeClick}
+          sx={{ 
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+            fontFamily: '"Inter", sans-serif'
+          }}
+        >
           Home
         </Button>
-        <Button color="inherit" onClick={handleProfileClick}>
+        <Button 
+          color="inherit" 
+          onClick={handleProfileClick}
+          sx={{ 
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+            fontFamily: '"Inter", sans-serif'
+          }}
+        >
           Profile
         </Button>
         <Box sx={{ flexGrow: 1 }} />
-        <Button color="inherit" onClick={onLogout}>
+        <Button 
+          color="inherit" 
+          onClick={onLogout}
+          sx={{ 
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+            fontFamily: '"Inter", sans-serif'
+          }}
+        >
           Logout
         </Button>
       </Toolbar>

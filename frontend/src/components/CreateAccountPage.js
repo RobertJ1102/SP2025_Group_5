@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Container, TextField, Button, Typography, Box, Alert, Paper } from "@mui/material";
+import '../styles/AuthPages.css';
 
 function CreateAccountPage() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,56 +47,77 @@ function CreateAccountPage() {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: "center" }}>
-        <Typography variant="h4" gutterBottom>
-          Create Account
-        </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">Account created! You can now log in.</Alert>}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Username"
-            type="text"
-            fullWidth
-            margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <TextField
-            label="Email"
-            type="email"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <TextField
-            label="Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <TextField
-            label="Confirm Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-            Register
-          </Button>
-        </form>
-      </Box>
-    </Container>
+    <Box className="auth-container">
+      <Container maxWidth="xs" sx={{ mt: -50 }}>
+        <Paper elevation={3} className="auth-paper">
+          <Box sx={{ textAlign: "center" }}>
+            <Box sx={{ mb: 3 }}>
+              <img src="/logo.png" alt="FareFinder Logo" style={{ maxWidth: '200px', height: 'auto' }} />
+            </Box>
+            {error && <Alert severity="error">{error}</Alert>}
+            {success && <Alert severity="success">Account created! You can now log in.</Alert>}
+            <form onSubmit={handleSubmit}>
+              <TextField
+                label="Username"
+                type="text"
+                fullWidth
+                margin="normal"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                variant="outlined"
+                className="auth-textfield"
+              />
+              <TextField
+                label="Email"
+                type="email"
+                fullWidth
+                margin="normal"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                variant="outlined"
+                className="auth-textfield"
+              />
+              <TextField
+                label="Password"
+                type="password"
+                fullWidth
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                variant="outlined"
+                className="auth-textfield"
+              />
+              <TextField
+                label="Confirm Password"
+                type="password"
+                fullWidth
+                margin="normal"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                variant="outlined"
+                className="auth-textfield"
+              />
+              <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                Register
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                fullWidth
+                sx={{ mt: 1 }}
+                onClick={() => navigate("/login")}
+              >
+                Back to Login
+              </Button>
+            </form>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
 

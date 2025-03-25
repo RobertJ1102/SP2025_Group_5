@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, Button, TextField } from '@mui/material';
+import { Typography, Box, Button, TextField, Stack } from '@mui/material';
 import './Info.css';
 
 function Preferences() {
@@ -75,10 +75,10 @@ function Preferences() {
   }
 
   return (
-    <Box className="container">
+    <Stack spacing={3}>
       <Typography variant="h4" className="title">Preferences</Typography>
       {isEditing ? (
-        <div className="text-field-container">
+        <Stack spacing={2} className="text-field-container">
           <TextField
             label="Search Range"
             name="search_range"
@@ -96,17 +96,17 @@ function Preferences() {
           <Button variant="contained" color="primary" onClick={handleSave} className="button">
             Save
           </Button>
-        </div>
+        </Stack>
       ) : (
-        <>
+        <Stack spacing={2}>
           <Typography variant="body1" className="detail">Search Range: {preferences.search_range}</Typography>
           <Typography variant="body1" className="detail">Price Range: {preferences.price_range}</Typography>
           <Button variant="outlined" onClick={handleEditToggle} className="button">
             Edit
           </Button>
-        </>
+        </Stack>
       )}
-    </Box>
+    </Stack>
   );
 }
 

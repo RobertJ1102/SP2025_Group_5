@@ -96,7 +96,8 @@ def get_user_history(request: Request, db: Session = Depends(get_db)):
     # Format the response
     history_data = [
         {
-            "address": address.final_address,
+            "starting_address": address.written_address,
+            "final_address": address.final_address,
             "timestamp": address.timestamp
         }
         for address in address_history

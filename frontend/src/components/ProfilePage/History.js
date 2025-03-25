@@ -56,7 +56,10 @@ function History() {
       {history.map((item, index) => (
         <Stack key={index} spacing={1}>
           <Typography variant="body1" className="detail">
-            Address: {item.address}
+            Starting Address: {item.starting_address}
+          </Typography>
+          <Typography variant="body1" className="detail">
+            Final Address: {item.final_address}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             Date: {formatDate(item.timestamp)}

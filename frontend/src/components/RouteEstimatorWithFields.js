@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Container, TextField, Button, Typography, Paper, Box } from "@mui/material";
 import MapComponent from "./MapComponent";
 import useUserLocation from "../hooks/useUserLocation";
-import { setKey, fromLatLng, fromAddress } from "react-geocode";
-
-// Set your Google API key.
-setKey("AIzaSyDW7FcjHO4DUj7wVzVSGXGOCcNpEDVrovY");
 
 const RouteEstimatorWithFields = () => {
   const { location, error } = useUserLocation();
@@ -17,11 +13,12 @@ const RouteEstimatorWithFields = () => {
   const [loading, setLoading] = useState(false);
   const [activeSelection, setActiveSelection] = useState("destination");
 
-  // When the user's location is available, prefill the pickup address.
+  // When the user's location is available, prefill the pickup address using reverse geocoding via the internal API.
   useEffect(() => {
     if (location) {
-      // Note: location from useUserLocation is an array: [lng, lat].
-      fromLatLng(location[1], location[0])
+      // location from useUserLocation is an array: [lng, lat]
+      fetch(`http://127.0.0.1:8000/api/reverse_geocode?lat=${location[1]}&lng=${location[0]}`)
+        .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
             setPickupAddress(response.results[0].formatted_address);
@@ -35,7 +32,8 @@ const RouteEstimatorWithFields = () => {
   // Map callbacks (receiving [lng, lat] arrays)
   const handleSetPickup = (lonLat) => {
     setPickupCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fromLatLng(lonLat[1], lonLat[0])
+    fetch(`http://127.0.0.1:8000/api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+      .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
           setPickupAddress(response.results[0].formatted_address);
@@ -46,7 +44,8 @@ const RouteEstimatorWithFields = () => {
 
   const handleSetDestination = (lonLat) => {
     setDestinationCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fromLatLng(lonLat[1], lonLat[0])
+    fetch(`http://127.0.0.1:8000/api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+      .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
           setDestinationAddress(response.results[0].formatted_address);
@@ -55,10 +54,11 @@ const RouteEstimatorWithFields = () => {
       .catch((err) => console.error("Reverse geocode error:", err));
   };
 
-  // Update coordinates when text fields are blurred.
+  // Update coordinates when text fields are blurred by using internal geocode endpoint.
   const updatePickupFromText = () => {
     if (pickupAddress) {
-      fromAddress(pickupAddress)
+      fetch(`http://127.0.0.1:8000/api/geocode?address=${encodeURIComponent(pickupAddress)}`)
+        .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
             const loc = response.results[0].geometry.location;
@@ -71,7 +71,8 @@ const RouteEstimatorWithFields = () => {
 
   const updateDestinationFromText = () => {
     if (destinationAddress) {
-      fromAddress(destinationAddress)
+      fetch(`http://127.0.0.1:8000/api/geocode?address=${encodeURIComponent(destinationAddress)}`)
+        .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
             const loc = response.results[0].geometry.location;

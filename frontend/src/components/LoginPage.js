@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box, Alert, Paper } from "@mui/material";
+import '../styles/AuthPages.css';
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -50,60 +51,62 @@ function LoginPage() {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
-        <Box sx={{ textAlign: "center" }}>
-          <Typography variant="h4" gutterBottom>
-            Login
-          </Typography>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              Login successful!
-            </Alert>
-          )}
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Username"
-              type="text"
-              fullWidth
-              margin="normal"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              variant="outlined"
-              sx={{ backgroundColor: "white" }}
-            />
-            <TextField
-              label="Password"
-              type="password"
-              fullWidth
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              variant="outlined"
-              sx={{ backgroundColor: "white" }}
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-              Login
-            </Button>
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
-              <Button variant="text" color="primary" onClick={() => (window.location.href = "/forgot-password")}>
-                Forgot Password?
-              </Button>
-              <Button variant="text" color="primary" onClick={() => (window.location.href = "/register")}>
-                Create Account
-              </Button>
+    <Box className="auth-container">
+      <Container maxWidth="xs" sx={{ mt: -50 }}>
+        <Paper elevation={3} className="auth-paper">
+          <Box sx={{ textAlign: "center" }}>
+            <Box sx={{ mb: 3 }}>
+              <img src="/logo.png" alt="FareFinder Logo" style={{ maxWidth: '200px', height: 'auto' }} />
             </Box>
-          </form>
-        </Box>
-      </Paper>
-    </Container>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                Login successful!
+              </Alert>
+            )}
+            <form onSubmit={handleSubmit}>
+              <TextField
+                label="Username"
+                type="text"
+                fullWidth
+                margin="normal"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                variant="outlined"
+                className="auth-textfield"
+              />
+              <TextField
+                label="Password"
+                type="password"
+                fullWidth
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                variant="outlined"
+                className="auth-textfield"
+              />
+              <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                Login
+              </Button>
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+                <Button variant="text" color="primary" onClick={() => (window.location.href = "/forgot-password")}>
+                  Forgot Password?
+                </Button>
+                <Button variant="text" color="primary" onClick={() => (window.location.href = "/register")}>
+                  Create Account
+                </Button>
+              </Box>
+            </form>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
 

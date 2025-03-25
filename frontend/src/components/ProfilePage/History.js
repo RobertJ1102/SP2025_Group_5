@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Stack } from '@mui/material';
 import './Info.css';
 
 function History() {
@@ -43,35 +43,27 @@ function History() {
   };
 
   if (loading) {
-    return (
-      <Box className="container">
-        <Typography>Loading...</Typography>
-      </Box>
-    );
+    return <Typography>Loading...</Typography>;
   }
 
   if (error) {
-    return (
-      <Box className="container">
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
+    return <Typography color="error">{error}</Typography>;
   }
 
   return (
-    <Box className="container">
+    <Stack spacing={3}>
       <Typography variant="h4" className="title">History</Typography>
       {history.map((item, index) => (
-        <Box key={index} sx={{ mb: 2 }}>
+        <Stack key={index} spacing={1}>
           <Typography variant="body1" className="detail">
             Address: {item.address}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             Date: {formatDate(item.timestamp)}
           </Typography>
-        </Box>
+        </Stack>
       ))}
-    </Box>
+    </Stack>
   );
 }
 

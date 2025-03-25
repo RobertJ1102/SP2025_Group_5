@@ -81,42 +81,123 @@ function Info() {
   }
 
   return (
-    <Box className="container">
-      <Typography variant="h4" className="title">User Information</Typography>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center',
+      gap: 4  // Increased consistent spacing between major sections
+    }}>
+      <img 
+        src="/avatar.png"
+        alt="User Avatar" 
+        style={{
+          width: '150px',
+          height: '150px',
+          borderRadius: '50%'
+        }}
+      />
+      
       {isEditing ? (
-        <div className="text-field-container">
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 2,
+          justifyContent: 'center',
+          width: '100%'
+        }}>
           <TextField
             label="First Name"
             name="first_name"
-            value={editData.first_name}
+            value={editData.first_name || ''}
             onChange={handleInputChange}
             className="detail"
+            placeholder="Enter First Name"
           />
           <TextField
             label="Last Name"
             name="last_name"
-            value={editData.last_name}
+            value={editData.last_name || ''}
             onChange={handleInputChange}
             className="detail"
+            placeholder="Enter Last Name"
           />
+        </Box>
+      ) : (
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 1,
+          justifyContent: 'center'
+        }}>
+          <Typography 
+            variant="h5"
+            sx={{ color: userInfo.first_name ? 'text.primary' : 'text.secondary' }}
+          >
+            {userInfo.first_name || 'First Name'}
+          </Typography>
+          <Typography 
+            variant="h5"
+            sx={{ color: userInfo.last_name ? 'text.primary' : 'text.secondary' }}
+          >
+            {userInfo.last_name || 'Last Name'}
+          </Typography>
+        </Box>
+      )}
+
+      {isEditing ? (
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+          width: '100%'
+        }}>
           <TextField
             label="Home Address"
             name="home_address"
-            value={editData.home_address}
+            value={editData.home_address || ''}
             onChange={handleInputChange}
             className="detail"
+            placeholder="Enter Home Address"
+            fullWidth
+            sx={{ maxWidth: '400px' }}
           />
-          <Button variant="contained" color="primary" onClick={handleSave} className="button">
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleSave} 
+            className="button"
+          >
             Save
           </Button>
-        </div>
+        </Box>
       ) : (
-        <>
-          <Typography variant="body1" className="info-detail">First Name: {userInfo.first_name}</Typography>
-          <Typography variant="body1" className="info-detail">Last Name: {userInfo.last_name}</Typography>
-          <Typography variant="body1" className="info-detail">Home Address: {userInfo.home_address}</Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-            <Button variant="outlined" onClick={handleEditToggle} className="info-button">
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+          width: '100%'
+        }}>
+          <Typography 
+            variant="body1" 
+            className="info-detail"
+            sx={{ 
+              textAlign: 'center',
+              color: userInfo.home_address ? 'text.primary' : 'text.secondary'
+            }}
+          >
+            {userInfo.home_address || 'Home Address'}
+          </Typography>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            width: '100%',
+            px: 2
+          }}>
+            <Button 
+              variant="outlined" 
+              onClick={handleEditToggle} 
+              className="info-button"
+            >
               Edit
             </Button>
             <Button 
@@ -127,7 +208,7 @@ function Info() {
               Change Password
             </Button>
           </Box>
-        </>
+        </Box>
       )}
     </Box>
   );

@@ -1,13 +1,16 @@
 """ Main API router """
 import random
+import requests
 from math import radians, sin, cos, sqrt, atan2
 from fastapi import APIRouter, HTTPException
 from app.auth import router as auth_router
 from app.profile import router as profile_router
 from app.uber import router as uber_router
 from .models import PriceEstimate, PriceEstimatesResponse
+from .config import GMAP_API_KEY
 
 router = APIRouter()
+GOOGLE_API_KEY = GMAP_API_KEY
 
 # General routes
 @router.get("/", tags=["root"])
@@ -88,6 +91,25 @@ def get_price_estimates(start_latitude: float, start_longitude: float,
     return PriceEstimatesResponse(prices=estimates)
 
 
+@router.get("/geocode")
+def geocode(address: str):
+    """ Get geocoding data for a given address """
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {"address": address, "key": GOOGLE_API_KEY}
+    response = requests.get(url, params=params, timeout=10)
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail="Geocoding API failed")
+    return response.json()
+
+@router.get("/reverse_geocode")
+def reverse_geocode(lat: float, lng: float):
+    """ Get reverse geocoding data for a given latitude and longitude """
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {"latlng": f"{lat},{lng}", "key": GOOGLE_API_KEY}
+    response = requests.get(url, params=params, timeout=10)
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail="Reverse geocoding API failed")
+    return response.json()
 
 # Include other sub-routers
 router.include_router(auth_router, prefix="/auth", tags=["Auth"])

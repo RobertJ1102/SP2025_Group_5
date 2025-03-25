@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { setKey, fromAddress, fromLatLng } from "react-geocode";
-
-// Set your Google API key for geocoding
-setKey("AIzaSyDW7FcjHO4DUj7wVzVSGXGOCcNpEDVrovY");
 
 const FareInputComponent = () => {
   const [pickupAddress, setPickupAddress] = useState("");
@@ -14,7 +10,7 @@ const FareInputComponent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Auto-fill pickup address using browser geolocation and reverse geocode
+  // Auto-fill pickup address using browser geolocation and reverse geocode via internal API
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -22,9 +18,11 @@ const FareInputComponent = () => {
           const { latitude, longitude } = position.coords;
           setPickupCoordinates({ lat: latitude, lng: longitude });
           try {
-            const response = await fromLatLng(latitude, longitude);
-            if (response.results && response.results[0]) {
-              setPickupAddress(response.results[0].formatted_address);
+            const response = await fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${latitude}&lng=${longitude}`);
+            if (!response.ok) throw new Error("Failed to retrieve address");
+            const data = await response.json();
+            if (data.results && data.results[0]) {
+              setPickupAddress(data.results[0].formatted_address);
             }
           } catch (err) {
             console.error("Reverse geocoding failed:", err);
@@ -46,13 +44,19 @@ const FareInputComponent = () => {
     setResult(null);
     setLoading(true);
     try {
-      // Geocode the destination address to get its coordinates
-      const destResponse = await fromAddress(destinationAddress);
-      if (destResponse.results && destResponse.results[0]) {
-        const { lat, lng } = destResponse.results[0].geometry.location;
+      // Use internal API to geocode the destination address
+      const destResponse = await fetch(
+        `http://127.0.0.1:8000/api/geocode?address=${encodeURIComponent(destinationAddress)}`
+      );
+      if (!destResponse.ok) {
+        throw new Error("Failed to geocode destination address");
+      }
+      const destData = await destResponse.json();
+      if (destData.results && destData.results[0]) {
+        const { lat, lng } = destData.results[0].geometry.location;
         setDestinationCoordinates({ lat, lng });
 
-        // Construct the query string for the API call
+        // Construct the query string for the Uber fare endpoint
         const queryParams = new URLSearchParams({
           start_lat: pickupCoordinates.lat,
           start_lon: pickupCoordinates.lng,
@@ -61,11 +65,9 @@ const FareInputComponent = () => {
         });
 
         const apiResponse = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`);
-
         if (!apiResponse.ok) {
-          throw new Error("API call failed");
+          throw new Error("Fare API call failed");
         }
-
         const data = await apiResponse.json();
         setResult(data);
       } else {

@@ -64,7 +64,10 @@ function History() {
       {history.map((item, index) => (
         <Box key={index} sx={{ mb: 2 }}>
           <Typography variant="body1" className="detail">
-            Address: {item.address}
+            Starting Address: {item.starting_address}
+          </Typography>
+          <Typography variant="body1" className="detail">
+            Final Address: {item.final_address}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             Date: {formatDate(item.timestamp)}

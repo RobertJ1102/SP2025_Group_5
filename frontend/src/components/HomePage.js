@@ -21,7 +21,6 @@ const HomePage = () => {
 
   return (
     <>
-      <GoogleMap />
       <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
       <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper elevation={3} sx={{ p: 2 }}>

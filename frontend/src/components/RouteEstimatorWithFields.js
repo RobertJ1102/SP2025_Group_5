@@ -12,6 +12,8 @@ const RouteEstimatorWithFields = () => {
   const [routeEstimation, setRouteEstimation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeSelection, setActiveSelection] = useState("destination");
+  const [pickupSuggestions, setPickupSuggestions] = useState([]);
+  const [destinationSuggestions, setDestinationSuggestions] = useState([]);
 
   // When the user's location is available, prefill the pickup address using reverse geocoding via the internal API.
   useEffect(() => {
@@ -176,6 +178,28 @@ const RouteEstimatorWithFields = () => {
     addRouteToHistory();
   };
 
+  const fetchSuggestions = async (input, setterFunction) => {
+    if (input.length < 3) {
+      setterFunction([]);
+      return;
+    }
+    try {
+      // Build URL with location parameters if available
+      let url = `http://127.0.0.1:8000/autocomplete?input=${encodeURIComponent(input)}`;
+      if (location) {
+        url += `&lat=${location[1]}&lng=${location[0]}`;
+      }
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.predictions) {
+        setterFunction(data.predictions);
+      }
+    } catch (err) {
+      console.error("Autocomplete error:", err);
+    }
+  };
+
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -191,18 +215,64 @@ const RouteEstimatorWithFields = () => {
             label="Pickup Location"
             fullWidth
             value={pickupAddress}
-            onChange={(e) => setPickupAddress(e.target.value)}
-            onBlur={updatePickupFromText}
+            onChange={(e) => {
+              setPickupAddress(e.target.value);
+              fetchSuggestions(e.target.value, setPickupSuggestions);
+            }}
+            onBlur={() => {
+              setTimeout(() => setPickupSuggestions([]), 200);
+              updatePickupFromText();
+            }}
           />
+          {pickupSuggestions.length > 0 && (
+            <Paper sx={{ mt: 1, position: 'absolute', zIndex: 1000, width: '100%' }}>
+              {pickupSuggestions.map((suggestion) => (
+                <Box
+                  key={suggestion.place_id}
+                  sx={{ p: 1, cursor: 'pointer', '&:hover': { backgroundColor: '#f5f5f5' } }}
+                  onClick={() => {
+                    setPickupAddress(suggestion.description);
+                    setPickupSuggestions([]);
+                    updatePickupFromText();
+                  }}
+                >
+                  <Typography>{suggestion.description}</Typography>
+                </Box>
+              ))}
+            </Paper>
+          )}
         </Box>
         <Box sx={{ mb: 3 }}>
           <TextField
             label="Destination Location"
             fullWidth
             value={destinationAddress}
-            onChange={(e) => setDestinationAddress(e.target.value)}
-            onBlur={updateDestinationFromText}
+            onChange={(e) => {
+              setDestinationAddress(e.target.value);
+              fetchSuggestions(e.target.value, setDestinationSuggestions);
+            }}
+            onBlur={() => {
+              setTimeout(() => setDestinationSuggestions([]), 200);
+              updateDestinationFromText();
+            }}
           />
+          {destinationSuggestions.length > 0 && (
+            <Paper sx={{ mt: 1, position: 'absolute', zIndex: 1000, width: '100%' }}>
+              {destinationSuggestions.map((suggestion) => (
+                <Box
+                  key={suggestion.place_id}
+                  sx={{ p: 1, cursor: 'pointer', '&:hover': { backgroundColor: '#f5f5f5' } }}
+                  onClick={() => {
+                    setDestinationAddress(suggestion.description);
+                    setDestinationSuggestions([]);
+                    updateDestinationFromText();
+                  }}
+                >
+                  <Typography>{suggestion.description}</Typography>
+                </Box>
+              ))}
+            </Paper>
+          )}
         </Box>
         <Box sx={{ width: "100%", height: "500px", mb: 3 }}>
           <MapComponent

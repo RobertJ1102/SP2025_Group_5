@@ -5,12 +5,13 @@ import math
 import string
 import requests
 from fastapi import APIRouter, HTTPException, Query
-from .models import PriceEstimate, PriceEstimatesResponse, LyftCostEstimate, LyftCostEstimatesResponse
+from .models import PriceEstimate, LyftCostEstimate, LyftCostEstimatesResponse
 from .config import GMAP_API_KEY
 
 router = APIRouter()
 
 EARTH_RADIUS = 6378137
+LYFT_COST_URL = "http://localhost:8000/lyft/cost"
 
 # Fake Lyft products
 LYFT_PRODUCTS = [
@@ -32,30 +33,24 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return r * c
 
-def get_lyft_price_estimates(start_lat, start_lon, end_lat, end_lon):
+def get_lyft_cost_estimates(start_lat, start_lon, end_lat, end_lon, ride_type="lyft_standard"):
     """
-    Generates fake price estimates for Lyft rides based on the distance.
+    Queries the mock Lyft /cost API to get ride cost estimates.
     """
-    distance_km = haversine_distance(start_lat, start_lon, end_lat, end_lon)
-    estimates = []
-    for product in LYFT_PRODUCTS:
-        # Calculate a fake fare based on a base fare plus a per km rate and a random adjustment
-        cost = product["base_fare"] + (product["per_km"] * distance_km)
-        low_estimate = cost + random.uniform(-1, 1)
-        high_estimate = low_estimate * random.uniform(1.1, 1.5)
-        estimate_str = f"${low_estimate:.2f} - ${high_estimate:.2f}"
-        estimates.append(PriceEstimate(
-            localized_display_name=product["display_name"],
-            distance=distance_km,
-            display_name=product["display_name"],
-            product_id=product["product_id"],
-            low_estimate=round(low_estimate, 2),
-            high_estimate=round(high_estimate, 2),
-            duration=int(distance_km / 40 * 3600),
-            estimate=estimate_str,
-            currency_code="USD"
-        ))
-    return estimates
+    params = {
+        "ride_type": ride_type,
+        "start_lat": start_lat,
+        "start_lng": start_lon,
+        "end_lat": end_lat,
+        "end_lng": end_lon,
+    }
+    
+    response = requests.get(LYFT_COST_URL, params=params, timeout=10)
+    
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.json())
+    
+    return response.json().get("cost_estimates", [])
 
 def move_location(lat, lon, meters, direction):
     """
@@ -120,10 +115,11 @@ def find_best_fare(start_lat, start_lon, end_lat, end_lon):
 
     for lat, lon, label in locations:
         if is_valid_street(lat, lon):
-            prices = get_lyft_price_estimates(lat, lon, end_lat, end_lon)
+            prices = get_lyft_cost_estimates(lat, lon, end_lat, end_lon)
             for ride in prices:
-                price = ride.low_estimate
-                ride_type = ride.display_name
+                # Use the estimated cost cents minimum from the cost estimates response
+                price = ride.get("estimated_cost_cents_min") / 100.0  # cents to dollars
+                ride_type = ride.get("display_name")
                 if best_price is None or (price is not None and price < best_price):
                     best_price = price
                     best_location = label
@@ -157,20 +153,6 @@ def get_best_lyft_fare(start_lat: float, start_lon: float, end_lat: float, end_l
         return best_fare
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
-
-@router.get("/best-lyft-fare-test/")
-def get_fake_lyft_fare(start_lat: float, start_lon: float):
-    """
-    Temporary endpoint that returns a fake 'best' Lyft ride estimate.
-    """
-    best_pickup_lat, best_pickup_lon = random_offset(start_lat, start_lon)
-    fake_price = round(random.uniform(10, 50), 2)
-    ride_type = random.choice([product["display_name"] for product in LYFT_PRODUCTS])
-    return {
-        "best_pickup_location": {"latitude": best_pickup_lat, "longitude": best_pickup_lon},
-        "estimated_price": fake_price,
-        "ride_type": ride_type
-    }
 
 def generate_token() -> str:
     """Generate a fake token string."""

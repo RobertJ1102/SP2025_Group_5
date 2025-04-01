@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException
 from app.auth import router as auth_router
 from app.profile import router as profile_router
 from app.uber import router as uber_router
+from app.lyft import router as lyft_router
 from .models import PriceEstimate, PriceEstimatesResponse
 from .config import GMAP_API_KEY
 
@@ -115,3 +116,4 @@ def reverse_geocode(lat: float, lng: float):
 router.include_router(auth_router, prefix="/auth", tags=["Auth"])
 router.include_router(profile_router, prefix="/profile", tags=["Profile"])
 router.include_router(uber_router, prefix="/uber", tags=["Uber"])
+router.include_router(lyft_router, prefix="/lyft", tags=["Lyft"])

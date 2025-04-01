@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Container, Typography } from "@mui/material";
 import WelcomeModal from "./WelcomeModal";
-import RouteEstimatorWithWideMap from "./RouteEstimatorWithWideMap";
+import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
 
 const HomePage = () => {
   const [showWelcome, setShowWelcome] = useState(false);
@@ -20,8 +21,13 @@ const HomePage = () => {
   return (
     <>
       <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
-      {/* Render the wide map component without a constraining container */}
-      <RouteEstimatorWithWideMap />
+      {/* Remove or adjust the Container and remove Paper to let the UI expand */}
+      <Container maxWidth="xl" disableGutters sx={{ mt: 0, mb: 0 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          FareFinder
+        </Typography>
+        <RouteEstimatorWithFields />
+      </Container>
     </>
   );
 };

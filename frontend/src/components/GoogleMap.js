@@ -4,8 +4,8 @@ import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
 const MAP_API_KEY = process.env.REACT_APP_GMAP_API_KEY;
 
 const INITIAL_CAMERA = {
-  center: { lat: 0, lng: 0 },
-  zoom: 2,
+  center: { lat: 38.64914935584339, lng: -90.31138747373849 },
+  zoom: 15,
 };
 
 const GoogleMap = ({

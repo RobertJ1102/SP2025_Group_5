@@ -24,7 +24,7 @@ function Header({ onLogout }) {
         top: 0,
         left: 0,
         right: 0,
-        background: "linear-gradient(to bottom, #1a237e, #000000)",
+        background: "linear-gradient(to bottom,rgb(63, 77, 233),rgb(16, 10, 43))",
       }}
     >
       <Toolbar>

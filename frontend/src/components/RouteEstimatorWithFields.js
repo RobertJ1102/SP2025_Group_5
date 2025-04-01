@@ -203,6 +203,25 @@ const RouteEstimatorWithFields = () => {
     }
   };
 
+  // Add new useEffect hooks to handle address updates
+  useEffect(() => {
+    if (pickupAddress) {
+      const timer = setTimeout(() => {
+        updatePickupFromText();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pickupAddress]);
+
+  useEffect(() => {
+    if (destinationAddress) {
+      const timer = setTimeout(() => {
+        updateDestinationFromText();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [destinationAddress]);
+
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -224,7 +243,6 @@ const RouteEstimatorWithFields = () => {
             }}
             onBlur={() => {
               setTimeout(() => setPickupSuggestions([]), 200);
-              updatePickupFromText();
             }}
           />
           {pickupSuggestions.length > 0 && (
@@ -236,7 +254,6 @@ const RouteEstimatorWithFields = () => {
                   onClick={() => {
                     setPickupAddress(suggestion.description);
                     setPickupSuggestions([]);
-                    updatePickupFromText();
                   }}
                 >
                   <Typography>{suggestion.description}</Typography>
@@ -256,7 +273,6 @@ const RouteEstimatorWithFields = () => {
             }}
             onBlur={() => {
               setTimeout(() => setDestinationSuggestions([]), 200);
-              updateDestinationFromText();
             }}
           />
           {destinationSuggestions.length > 0 && (
@@ -268,7 +284,6 @@ const RouteEstimatorWithFields = () => {
                   onClick={() => {
                     setDestinationAddress(suggestion.description);
                     setDestinationSuggestions([]);
-                    updateDestinationFromText();
                   }}
                 >
                   <Typography>{suggestion.description}</Typography>

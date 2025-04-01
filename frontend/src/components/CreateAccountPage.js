@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Box, Alert, Paper } from "@mui/material";
 import '../styles/AuthPages.css';
+import logo from "../assets/logo.png";
 
 function CreateAccountPage() {
   const navigate = useNavigate();
@@ -48,11 +49,11 @@ function CreateAccountPage() {
 
   return (
     <Box className="auth-container">
-      <Container maxWidth="xs" sx={{ mt: -50 }}>
+      <Container maxWidth="xs">
         <Paper elevation={3} className="auth-paper">
           <Box sx={{ textAlign: "center" }}>
             <Box sx={{ mb: 3 }}>
-              <img src="/logo.png" alt="FareFinder Logo" style={{ maxWidth: '200px', height: 'auto' }} />
+              <img src={logo} alt="FareFinder Logo" style={{ maxWidth: '200px', height: 'auto' }} />
             </Box>
             {error && <Alert severity="error">{error}</Alert>}
             {success && <Alert severity="success">Account created! You can now log in.</Alert>}

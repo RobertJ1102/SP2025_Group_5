@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Typography, Paper } from "@mui/material";
 import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
 import WelcomeModal from "./WelcomeModal";
+import GoogleMap from "./GoogleMap";
 
 const HomePage = () => {
   const [showWelcome, setShowWelcome] = useState(false);
@@ -20,10 +21,8 @@ const HomePage = () => {
 
   return (
     <>
-      <WelcomeModal 
-        open={showWelcome} 
-        onClose={handleCloseWelcome} 
-      />
+      <GoogleMap />
+      <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
       <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper elevation={3} sx={{ p: 2 }}>
           <Typography variant="h4" align="center" gutterBottom>

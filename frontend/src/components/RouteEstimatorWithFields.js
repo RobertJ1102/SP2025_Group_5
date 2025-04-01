@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Container, TextField, Button, Typography, Paper, Box } from "@mui/material";
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Box,
+} from "@mui/material";
 import MapComponent from "./MapComponent";
 import useUserLocation from "../hooks/useUserLocation";
+import GoogleMap from "./GoogleMap"; // Assuming you have a GoogleMap component
 
 const RouteEstimatorWithFields = () => {
   const { location, error } = useUserLocation();
@@ -17,7 +25,9 @@ const RouteEstimatorWithFields = () => {
   useEffect(() => {
     if (location) {
       // location from useUserLocation is an array: [lng, lat]
-      fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${location[1]}&lng=${location[0]}`)
+      fetch(
+        `http://127.0.0.1:8000/reverse_geocode?lat=${location[1]}&lng=${location[0]}`
+      )
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -32,7 +42,9 @@ const RouteEstimatorWithFields = () => {
   // Map callbacks (receiving [lng, lat] arrays)
   const handleSetPickup = (lonLat) => {
     setPickupCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+    fetch(
+      `http://127.0.0.1:8000/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`
+    )
       .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
@@ -44,7 +56,9 @@ const RouteEstimatorWithFields = () => {
 
   const handleSetDestination = (lonLat) => {
     setDestinationCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+    fetch(
+      `http://127.0.0.1:8000/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`
+    )
       .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
@@ -57,7 +71,11 @@ const RouteEstimatorWithFields = () => {
   // Update coordinates when text fields are blurred by using internal geocode endpoint.
   const updatePickupFromText = () => {
     if (pickupAddress) {
-      fetch(`http://127.0.0.1:8000/geocode?address=${encodeURIComponent(pickupAddress)}`)
+      fetch(
+        `http://127.0.0.1:8000/geocode?address=${encodeURIComponent(
+          pickupAddress
+        )}`
+      )
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -71,7 +89,11 @@ const RouteEstimatorWithFields = () => {
 
   const updateDestinationFromText = () => {
     if (destinationAddress) {
-      fetch(`http://127.0.0.1:8000/geocode?address=${encodeURIComponent(destinationAddress)}`)
+      fetch(
+        `http://127.0.0.1:8000/geocode?address=${encodeURIComponent(
+          destinationAddress
+        )}`
+      )
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -98,7 +120,9 @@ const RouteEstimatorWithFields = () => {
       end_lon: destinationCoordinates.lng,
     });
     try {
-      const response = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`);
+      const response = await fetch(
+        `http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`
+      );
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
       setRouteEstimation(data);
@@ -110,7 +134,9 @@ const RouteEstimatorWithFields = () => {
 
   const addRouteToHistory = async () => {
     if (!pickupCoordinates || !destinationCoordinates) {
-      console.error("Both pickup and destination must be set to add to history");
+      console.error(
+        "Both pickup and destination must be set to add to history"
+      );
       return;
     }
 
@@ -124,14 +150,17 @@ const RouteEstimatorWithFields = () => {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/profile/history/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(addressData),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/profile/history/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(addressData),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to add route to history");
       console.log("Route added to history successfully");
@@ -205,12 +234,16 @@ const RouteEstimatorWithFields = () => {
           />
         </Box>
         <Box sx={{ width: "100%", height: "500px", mb: 3 }}>
-          <MapComponent
+          <GoogleMap
             activeSelection={activeSelection}
             onSetPickup={handleSetPickup}
             onSetDestination={handleSetDestination}
             currentLocation={
-              pickupCoordinates ? pickupCoordinates : location ? { lat: location[1], lng: location[0] } : null
+              pickupCoordinates
+                ? pickupCoordinates
+                : location
+                ? { lat: location[1], lng: location[0] }
+                : null
             }
             pickupPoint={pickupCoordinates}
             destinationPoint={destinationCoordinates}
@@ -224,7 +257,9 @@ const RouteEstimatorWithFields = () => {
             Set Pickup by Map
           </Button>
           <Button
-            variant={activeSelection === "destination" ? "contained" : "outlined"}
+            variant={
+              activeSelection === "destination" ? "contained" : "outlined"
+            }
             onClick={() => setActiveSelection("destination")}
           >
             Set Destination by Map
@@ -252,7 +287,11 @@ const RouteEstimatorWithFields = () => {
           </Box>
         )}
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleOpenUberAndAddHistory}
+          >
             Open in Uber
           </Button>
         </Box>

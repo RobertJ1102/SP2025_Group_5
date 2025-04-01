@@ -2,6 +2,7 @@
 import math
 import random
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from fastapi import APIRouter, HTTPException
 from .config import UBER_CLIENT_ID, UBER_CLIENT_SECRET, GMAP_API_KEY
 
@@ -114,11 +115,20 @@ def get_uber_price_estimates(start_lat, start_lon, end_lat, end_lon):
 
     return response.json().get("prices", [])
 
+def process_location_uber(location, end_lat, end_lon):
+    """
+    For a given location, checks if it's valid and retrieves Uber price estimates.
+    Returns a tuple (label, prices) or None if the location isn't valid.
+    """
+    lat, lon, label = location
+    if is_valid_street(lat, lon):
+        prices = get_uber_price_estimates(lat, lon, end_lat, end_lon)
+        return (label, prices)
+    return None
 
 def find_best_fare(start_lat, start_lon, end_lat, end_lon):
     """
-    Finds the best Uber fare by checking the original location
-    and valid nearby locations (300ft & 500ft in 8 directions).
+    Finds the best Uber fare by checking the original location and nearby pickup spots in parallel.
     """
     locations = [
         (start_lat, start_lon, "Original"),
@@ -139,19 +149,21 @@ def find_best_fare(start_lat, start_lon, end_lat, end_lon):
         move_location(start_lat, start_lon, 91, "SW") + ("SW 300ft",),
         move_location(start_lat, start_lon, 152, "SW") + ("SW 500ft",),
     ]
-
+    
     best_price = None
     best_location = None
     best_ride_type = None
 
-    for lat, lon, label in locations:
-        if is_valid_street(lat, lon):
-            prices = get_uber_price_estimates(lat, lon, end_lat, end_lon)
-
+    with ThreadPoolExecutor(max_workers=len(locations)) as executor:
+        futures = [executor.submit(process_location_uber, loc, end_lat, end_lon) for loc in locations]
+        for future in as_completed(futures):
+            result = future.result()
+            if result is None:
+                continue
+            label, prices = result
             for ride in prices:
                 price = ride.get("low_estimate")
                 ride_type = ride.get("display_name")
-
                 if best_price is None or (price is not None and price < best_price):
                     best_price = price
                     best_location = label
@@ -162,6 +174,7 @@ def find_best_fare(start_lat, start_lon, end_lat, end_lon):
         "best_price": best_price,
         "best_ride_type": best_ride_type
     }
+
 
 
 def random_offset(lat, lon, max_offset=400):

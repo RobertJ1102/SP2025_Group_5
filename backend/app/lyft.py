@@ -4,6 +4,7 @@ import random
 import math
 import string
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from fastapi import APIRouter, HTTPException, Query
 from .models import PriceEstimate, LyftCostEstimate, LyftCostEstimatesResponse
 from .config import GMAP_API_KEY
@@ -84,9 +85,22 @@ def is_valid_street(lat, lon):
             return True
     return False
 
+
+def process_location(location, end_lat, end_lon):
+    """
+    Checks if a given location is valid and retrieves Lyft cost estimates.
+    Returns a tuple of (label, prices) if valid, or None otherwise.
+    """
+    lat, lon, label = location
+    if is_valid_street(lat, lon):
+        prices = get_lyft_cost_estimates(lat, lon, end_lat, end_lon)
+        return (label, prices)
+    return None
+
 def find_best_fare(start_lat, start_lon, end_lat, end_lon):
     """
-    Finds the best Lyft fare by checking the original location and several nearby pickup spots.
+    Finds the best Lyft fare by checking the original location and several
+    nearby pickup spots in parallel.
     """
     # Generate a list of nearby pickup locations (300ft and 500ft offsets in various directions)
     locations = [
@@ -113,12 +127,17 @@ def find_best_fare(start_lat, start_lon, end_lat, end_lon):
     best_location = None
     best_ride_type = None
 
-    for lat, lon, label in locations:
-        if is_valid_street(lat, lon):
-            prices = get_lyft_cost_estimates(lat, lon, end_lat, end_lon)
+    # Use a thread pool to process locations concurrently
+    with ThreadPoolExecutor(max_workers=len(locations)) as executor:
+        futures = [executor.submit(process_location, loc, end_lat, end_lon) for loc in locations]
+        for future in as_completed(futures):
+            result = future.result()
+            if result is None:
+                continue
+            label, prices = result
             for ride in prices:
-                # Use the estimated cost cents minimum from the cost estimates response
-                price = ride.get("estimated_cost_cents_min") / 100.0  # cents to dollars
+                # Convert cents to dollars for comparison
+                price = ride.get("estimated_cost_cents_min") / 100.0
                 ride_type = ride.get("display_name")
                 if best_price is None or (price is not None and price < best_price):
                     best_price = price

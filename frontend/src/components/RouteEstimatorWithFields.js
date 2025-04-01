@@ -23,7 +23,7 @@ const RouteEstimatorWithFields = () => {
 
   // When the user's location is available, prefill the pickup address using reverse geocoding via the internal API.
   useEffect(() => {
-    if (location) {
+    if (location && !pickupCoordinates) {
       // location from useUserLocation is an array: [lng, lat]
       fetch(
         `http://127.0.0.1:8000/reverse_geocode?lat=${location[1]}&lng=${location[0]}`

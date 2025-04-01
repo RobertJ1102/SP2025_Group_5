@@ -209,14 +209,13 @@ const RouteEstimatorWithFields = () => {
 
   return (
     <Container sx={{ mt: 8, mb: 8 }}>
-      {/* <Paper elevation={3} sx={{ p: 2 }}> */}
-      {/* <Typography variant="h5" align="center" gutterBottom>
-          Route Estimator
-        </Typography> */}
+      <Typography variant="h5" align="center" gutterBottom>
+        Route Estimator
+      </Typography>
 
       <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
         {/* Left Sidebar - 33% */}
-        <Box sx={{ width: "40%" }}>
+        <Box sx={{ width: "60%" }}>
           <Box sx={{ mb: 3 }}>
             <TextField
               label="Pickup Location"

@@ -24,7 +24,6 @@ const HomePage = () => {
   return (
     <>
       <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
-      {/* Remove or adjust the Container and remove Paper to let the UI expand */}
       <Container maxWidth={false} disableGutters sx={{ mt: 4, px: 4 }}>
         <Typography variant="h4" align="center" gutterBottom>
           FareFinder

@@ -208,7 +208,7 @@ const RouteEstimatorWithFields = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 8, mb: 8 }}>
+    <Container sx={{ mt: 8, mb: 8 }}>
       {/* <Paper elevation={3} sx={{ p: 2 }}> */}
       {/* <Typography variant="h5" align="center" gutterBottom>
           Route Estimator
@@ -216,7 +216,7 @@ const RouteEstimatorWithFields = () => {
 
       <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
         {/* Left Sidebar - 33% */}
-        <Box sx={{ width: "33%" }}>
+        <Box sx={{ width: "40%" }}>
           <Box sx={{ mb: 3 }}>
             <TextField
               label="Pickup Location"
@@ -330,7 +330,7 @@ const RouteEstimatorWithFields = () => {
         </Box>
 
         {/* Right Map Section - 66% */}
-        <Box sx={{ width: "66%", height: "600px" }}>
+        <Box sx={{ width: "100%", height: "600px" }}>
           <GoogleMap
             activeSelection={activeSelection}
             onSetPickup={handleSetPickup}

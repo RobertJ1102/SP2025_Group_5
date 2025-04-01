@@ -162,7 +162,7 @@ const MapComponent = ({
     }
   }, [currentLocation, map]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "500px" }} />;
+  return <div ref={mapRef} style={{ width: "100%", height: "700px" }} />;
 };
 
 export default MapComponent;

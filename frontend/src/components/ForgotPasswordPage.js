@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Box, Alert, Paper } from "@mui/material";
 import '../styles/AuthPages.css';
+import logo from "../assets/logo.png";
 
 function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -35,11 +36,11 @@ function ForgotPasswordPage() {
 
   return (
     <Box className="auth-container">
-      <Container maxWidth="xs" sx={{ mt: -50 }}>
+      <Container maxWidth="xs">
         <Paper elevation={3} className="auth-paper">
           <Box sx={{ textAlign: "center" }}>
             <Box sx={{ mb: 3 }}>
-              <img src="/logo.png" alt="FareFinder Logo" style={{ maxWidth: '200px', height: 'auto' }} />
+              <img src={logo} alt="FareFinder Logo" style={{ maxWidth: '200px', height: 'auto' }} />
             </Box>
             {error && <Alert severity="error">{error}</Alert>}
             {message && <Alert severity="success">{message}</Alert>}

@@ -36,7 +36,7 @@ function ChangePasswordPage() {
 
   return (
     <Box className="auth-container">
-      <Container maxWidth="xs" sx={{ mt: -50 }}>
+      <Container maxWidth="xs">
         <Paper elevation={3} className="auth-paper">
           <Box sx={{ textAlign: "center" }}>
             <Typography variant="h5" gutterBottom>

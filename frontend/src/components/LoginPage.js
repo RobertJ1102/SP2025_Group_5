@@ -65,7 +65,7 @@ function LoginPage() {
 
   return (
     <Box className="auth-container">
-      <Container maxWidth="xs" sx={{ mt: -50 }}>
+      <Container maxWidth="xs">
         <Paper elevation={3} className="auth-paper">
           <Box sx={{ textAlign: "center" }}>
             <Box sx={{ mb: 3 }}>

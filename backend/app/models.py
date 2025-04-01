@@ -41,6 +41,7 @@ class Address(Base):
 
     user = relationship("User", back_populates="addresses")
 
+# Uber Prices
 class PriceEstimate(BaseModel):
     """ PriceEstimate model """
     localized_display_name: str
@@ -56,3 +57,22 @@ class PriceEstimate(BaseModel):
 class PriceEstimatesResponse(BaseModel):
     """ PriceEstimatesResponse model """
     prices: List[PriceEstimate]
+
+
+# Lyft Cost Estimates Endpoint
+class LyftCostEstimate(BaseModel):
+    """ LyftCostEstimate model """
+    cost_token: str
+    display_name: str
+    estimated_cost_cents_min: int
+    estimated_cost_cents_max: int
+    estimated_distance_miles: float
+    estimated_duration_seconds: int
+    is_valid_estimate: bool
+    primetime_confirmation_token: str
+    primetime_percentage: str
+    ride_type: str
+
+class LyftCostEstimatesResponse(BaseModel):
+    """ LyftCostEstimatesResponse model """
+    cost_estimates: List[LyftCostEstimate]

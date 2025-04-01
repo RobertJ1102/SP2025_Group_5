@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Container, Typography } from "@mui/material";
 import WelcomeModal from "./WelcomeModal";
 import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
+import RouteEstimatorOverlay from "./RouteEstimatorOverlay";
+import RouteEstimatorWithWideMap from "./RouteEstimatorWithWideMap";
+import RouteEstimatorTwoColumn from "./two";
 
 const HomePage = () => {
   const [showWelcome, setShowWelcome] = useState(false);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Paper } from "@mui/material";
-import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
+import { Container, Typography } from "@mui/material";
 import WelcomeModal from "./WelcomeModal";
+import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
 
 const HomePage = () => {
   const [showWelcome, setShowWelcome] = useState(false);
@@ -20,22 +20,13 @@ const HomePage = () => {
 
   return (
     <>
-      <WelcomeModal 
-        open={showWelcome} 
-        onClose={handleCloseWelcome} 
-      />
-      <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 2 }}>
-          <Typography variant="h4" align="center" gutterBottom>
-            FareFinder
-          </Typography>
-          {/* Map Section */}
-          {/* <Box sx={{ width: "100%", height: "300px", mb: 2 }}>
-            <MapComponent />
-          </Box> */}
-          {/* Fare Input Section */}
-          <RouteEstimatorWithFields />
-        </Paper>
+      <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
+      {/* Remove or adjust the Container and remove Paper to let the UI expand */}
+      <Container maxWidth="xl" disableGutters sx={{ mt: 0, mb: 0 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          FareFinder
+        </Typography>
+        <RouteEstimatorWithFields />
       </Container>
     </>
   );

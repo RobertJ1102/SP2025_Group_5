@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, TextField, Button, Typography, Paper, Box } from "@mui/material";
 import MapComponent from "./MapComponent";
 import useUserLocation from "../hooks/useUserLocation";
+import GoogleMap from "./GoogleMap"; // Assuming you have a GoogleMap component
 
 const RouteEstimatorWithFields = () => {
   const { location, error } = useUserLocation();
@@ -11,13 +12,13 @@ const RouteEstimatorWithFields = () => {
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [routeEstimation, setRouteEstimation] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [activeSelection, setActiveSelection] = useState("destination");
+  const [activeSelection, setActiveSelection] = useState("auto");
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
 
   // When the user's location is available, prefill the pickup address using reverse geocoding via the internal API.
   useEffect(() => {
-    if (location) {
+    if (location && !pickupCoordinates) {
       // location from useUserLocation is an array: [lng, lat]
       fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${location[1]}&lng=${location[0]}`)
         .then((res) => res.json())
@@ -100,9 +101,11 @@ const RouteEstimatorWithFields = () => {
       end_lon: destinationCoordinates.lng,
     });
     try {
+      console.log("Estimating route with params:", queryParams.toString());
       const response = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`);
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
+      console.log("Route estimation data:", data);
       setRouteEstimation(data);
     } catch (err) {
       console.error("Route estimation error:", err);
@@ -275,7 +278,7 @@ const RouteEstimatorWithFields = () => {
           )}
         </Box>
         <Box sx={{ width: "100%", height: "500px", mb: 3 }}>
-          <MapComponent
+          <GoogleMap
             activeSelection={activeSelection}
             onSetPickup={handleSetPickup}
             onSetDestination={handleSetDestination}

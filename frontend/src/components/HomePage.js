@@ -25,9 +25,6 @@ const HomePage = () => {
     <>
       <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
       <Container maxWidth={false} disableGutters sx={{ mt: 4, px: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          FareFinder
-        </Typography>
         <RouteEstimatorWithFields />
       </Container>
     </>

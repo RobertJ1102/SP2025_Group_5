@@ -208,141 +208,138 @@ const RouteEstimatorWithFields = () => {
   }
 
   return (
-    <Container sx={{ mt: 8, mb: 8 }}>
-      <Typography variant="h5" align="center" gutterBottom>
-        Route Estimator
-      </Typography>
-
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-        {/* Left Sidebar - 33% */}
-        <Box sx={{ width: "60%" }}>
-          <Box sx={{ mb: 3 }}>
-            <TextField
-              label="Pickup Location"
-              fullWidth
-              value={pickupAddress}
-              onChange={(e) => {
-                setPickupAddress(e.target.value);
-                fetchSuggestions(e.target.value, setPickupSuggestions);
-              }}
-              onBlur={() => {
-                setTimeout(() => setPickupSuggestions([]), 200);
-                updatePickupFromText();
-              }}
-            />
-            {pickupSuggestions.length > 0 && (
-              <Paper sx={{ mt: 1, position: "absolute", zIndex: 1000, width: "30%" }}>
-                {pickupSuggestions.map((suggestion) => (
-                  <Box
-                    key={suggestion.place_id}
-                    sx={{ p: 1, cursor: "pointer", "&:hover": { backgroundColor: "#f5f5f5" } }}
-                    onClick={() => {
-                      setPickupAddress(suggestion.description);
-                      setPickupSuggestions([]);
-                      updatePickupFromText();
-                    }}
-                  >
-                    <Typography>{suggestion.description}</Typography>
-                  </Box>
-                ))}
-              </Paper>
-            )}
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <TextField
-              label="Destination Location"
-              fullWidth
-              value={destinationAddress}
-              onChange={(e) => {
-                setDestinationAddress(e.target.value);
-                fetchSuggestions(e.target.value, setDestinationSuggestions);
-              }}
-              onBlur={() => {
-                setTimeout(() => setDestinationSuggestions([]), 200);
-                updateDestinationFromText();
-              }}
-            />
-            {destinationSuggestions.length > 0 && (
-              <Paper sx={{ mt: 1, position: "absolute", zIndex: 1000, width: "30%" }}>
-                {destinationSuggestions.map((suggestion) => (
-                  <Box
-                    key={suggestion.place_id}
-                    sx={{ p: 1, cursor: "pointer", "&:hover": { backgroundColor: "#f5f5f5" } }}
-                    onClick={() => {
-                      setDestinationAddress(suggestion.description);
-                      setDestinationSuggestions([]);
-                      updateDestinationFromText();
-                    }}
-                  >
-                    <Typography>{suggestion.description}</Typography>
-                  </Box>
-                ))}
-              </Paper>
-            )}
-          </Box>
-
-          <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
-            <Button
-              variant={activeSelection === "pickup" ? "contained" : "outlined"}
-              onClick={() => setActiveSelection("pickup")}
-            >
-              Set Pickup by Map
-            </Button>
-            <Button
-              variant={activeSelection === "destination" ? "contained" : "outlined"}
-              onClick={() => setActiveSelection("destination")}
-            >
-              Set Destination by Map
-            </Button>
-          </Box>
-
-          <Button variant="contained" fullWidth onClick={estimateRoute}>
-            Estimate Route
-          </Button>
-
-          {loading && (
-            <Typography variant="body1" align="center" sx={{ mt: 2 }}>
-              Loading...
-            </Typography>
-          )}
-
-          {routeEstimation && (
-            <Box sx={{ mt: 2 }}>
-              <Typography>
-                <strong>Best Location:</strong> {routeEstimation.best_location}
-              </Typography>
-              <Typography>
-                <strong>Best Price:</strong> {routeEstimation.best_price}
-              </Typography>
-              <Typography>
-                <strong>Best Ride Type:</strong> {routeEstimation.best_ride_type}
-              </Typography>
+    <Container maxWidth={false} disableGutters sx={{ mt: 8, mb: 8, px: 4 }}>
+      <Paper elevation={3} sx={{ p: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+          {/* Left Sidebar - 33% */}
+          <Box sx={{ width: "40%" }}>
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                label="Pickup Location"
+                fullWidth
+                value={pickupAddress}
+                onChange={(e) => {
+                  setPickupAddress(e.target.value);
+                  fetchSuggestions(e.target.value, setPickupSuggestions);
+                }}
+                onBlur={() => {
+                  setTimeout(() => setPickupSuggestions([]), 200);
+                  updatePickupFromText();
+                }}
+              />
+              {pickupSuggestions.length > 0 && (
+                <Paper sx={{ mt: 1, position: "absolute", zIndex: 1000, width: "30%" }}>
+                  {pickupSuggestions.map((suggestion) => (
+                    <Box
+                      key={suggestion.place_id}
+                      sx={{ p: 1, cursor: "pointer", "&:hover": { backgroundColor: "#f5f5f5" } }}
+                      onClick={() => {
+                        setPickupAddress(suggestion.description);
+                        setPickupSuggestions([]);
+                        updatePickupFromText();
+                      }}
+                    >
+                      <Typography>{suggestion.description}</Typography>
+                    </Box>
+                  ))}
+                </Paper>
+              )}
             </Box>
-          )}
 
-          <Box sx={{ mt: 2 }}>
-            <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
-              Open in Uber
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                label="Destination Location"
+                fullWidth
+                value={destinationAddress}
+                onChange={(e) => {
+                  setDestinationAddress(e.target.value);
+                  fetchSuggestions(e.target.value, setDestinationSuggestions);
+                }}
+                onBlur={() => {
+                  setTimeout(() => setDestinationSuggestions([]), 200);
+                  updateDestinationFromText();
+                }}
+              />
+              {destinationSuggestions.length > 0 && (
+                <Paper sx={{ mt: 1, position: "absolute", zIndex: 1000, width: "30%" }}>
+                  {destinationSuggestions.map((suggestion) => (
+                    <Box
+                      key={suggestion.place_id}
+                      sx={{ p: 1, cursor: "pointer", "&:hover": { backgroundColor: "#f5f5f5" } }}
+                      onClick={() => {
+                        setDestinationAddress(suggestion.description);
+                        setDestinationSuggestions([]);
+                        updateDestinationFromText();
+                      }}
+                    >
+                      <Typography>{suggestion.description}</Typography>
+                    </Box>
+                  ))}
+                </Paper>
+              )}
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
+              <Button
+                variant={activeSelection === "pickup" ? "contained" : "outlined"}
+                onClick={() => setActiveSelection("pickup")}
+              >
+                Set Pickup by Map
+              </Button>
+              <Button
+                variant={activeSelection === "destination" ? "contained" : "outlined"}
+                onClick={() => setActiveSelection("destination")}
+              >
+                Set Destination by Map
+              </Button>
+            </Box>
+
+            <Button variant="contained" fullWidth onClick={estimateRoute}>
+              Estimate Route
             </Button>
+
+            {loading && (
+              <Typography variant="body1" align="center" sx={{ mt: 2 }}>
+                Loading...
+              </Typography>
+            )}
+
+            {routeEstimation && (
+              <Box sx={{ mt: 2 }}>
+                <Typography>
+                  <strong>Best Location:</strong> {routeEstimation.best_location}
+                </Typography>
+                <Typography>
+                  <strong>Best Price:</strong> {routeEstimation.best_price}
+                </Typography>
+                <Typography>
+                  <strong>Best Ride Type:</strong> {routeEstimation.best_ride_type}
+                </Typography>
+              </Box>
+            )}
+
+            <Box sx={{ mt: 2 }}>
+              <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
+                Open in Uber
+              </Button>
+            </Box>
+          </Box>
+
+          {/* Right Map Section - 66% */}
+          <Box sx={{ width: "100%", height: "800px" }}>
+            <GoogleMap
+              activeSelection={activeSelection}
+              onSetPickup={handleSetPickup}
+              onSetDestination={handleSetDestination}
+              currentLocation={
+                pickupCoordinates ? pickupCoordinates : location ? { lat: location[1], lng: location[0] } : null
+              }
+              pickupPoint={pickupCoordinates}
+              destinationPoint={destinationCoordinates}
+            />
           </Box>
         </Box>
-
-        {/* Right Map Section - 66% */}
-        <Box sx={{ width: "100%", height: "600px" }}>
-          <GoogleMap
-            activeSelection={activeSelection}
-            onSetPickup={handleSetPickup}
-            onSetDestination={handleSetDestination}
-            currentLocation={
-              pickupCoordinates ? pickupCoordinates : location ? { lat: location[1], lng: location[0] } : null
-            }
-            pickupPoint={pickupCoordinates}
-            destinationPoint={destinationCoordinates}
-          />
-        </Box>
-      </Box>
-      {/* </Paper> */}
+      </Paper>
     </Container>
   );
 };

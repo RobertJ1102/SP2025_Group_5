@@ -24,9 +24,7 @@ const HomePage = () => {
   return (
     <>
       <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
-      <Container maxWidth={false} disableGutters sx={{ mt: 4, px: 4 }}>
         <RouteEstimatorWithFields />
-      </Container>
     </>
   );
 };

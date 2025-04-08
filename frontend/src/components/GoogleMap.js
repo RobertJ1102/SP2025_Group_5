@@ -84,7 +84,7 @@ const GoogleMap = ({
         defaultZoom={currentLocation ? 15 : INITIAL_CAMERA.zoom}
         onMapLoad={handleMapLoad}
         onClick={handleMapClick}
-        style={{ width: "100%", height: "800px" }}
+        style={{ width: "100%", height: "100%" }}
       >
         {/* Pickup Marker (Green) */}
         {pickupPoint && <Marker position={pickupPoint} options={{ icon: getMarkerIcon("green", 10) }} />}

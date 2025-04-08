@@ -199,7 +199,7 @@ const RouteEstimatorOverlay = () => {
       <APIProvider apiKey={MAP_API_KEY}>
         <Map
           defaultZoom={14}
-          center={
+          defaultCenter={
             pickupCoordinates
               ? pickupCoordinates
               : location

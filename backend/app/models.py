@@ -24,6 +24,7 @@ class User(Base):
     max_price = Column(Integer, default=50)  # Maximum price willing to pay
 
     addresses = relationship("Address", back_populates="user")
+    saved_addresses = relationship("UserAddress", back_populates="user")
 
 class Address(Base):
     """Address model"""
@@ -76,3 +77,17 @@ class LyftCostEstimate(BaseModel):
 class LyftCostEstimatesResponse(BaseModel):
     """ LyftCostEstimatesResponse model """
     cost_estimates: List[LyftCostEstimate]
+
+# User Addresses
+class UserAddress(Base):
+    """ UserAddress model for storing user addresses """
+    __tablename__ = "user_addresses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    address = Column(String(255))
+    nickname = Column(String(50))  # e.g.  "Home", "Work"
+    latitude = Column(Float)
+    longitude = Column(Float)
+
+    user = relationship("User", back_populates="saved_addresses")

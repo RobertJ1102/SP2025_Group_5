@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, TextField, Button, Typography, Paper } from "@mui/material";
+import { Box, TextField, Button, Typography, Paper, MenuItem, Select, IconButton } from "@mui/material";
 import GoogleMap from "./GoogleMap";
 import useUserLocation from "../hooks/useUserLocation";
 
@@ -14,6 +14,9 @@ const RouteEstimatorWithFields = () => {
   const [activeSelection, setActiveSelection] = useState("auto");
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [newAddressNickname, setNewAddressNickname] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState("");
 
   // Prefill pickup coordinates and address when location is available
   useEffect(() => {
@@ -207,6 +210,68 @@ const RouteEstimatorWithFields = () => {
     }
   }, [destinationAddress]);
 
+  // Fetch saved addresses on component mount
+  useEffect(() => {
+    fetchSavedAddresses();
+  }, []);
+
+  const fetchSavedAddresses = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/profile/saved-addresses", {
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSavedAddresses(data);
+      }
+    } catch (err) {
+      console.error("Error fetching saved addresses:", err);
+    }
+  };
+
+  const handleSaveCurrentAddress = async () => {
+    if (!destinationAddress || !newAddressNickname) return;
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/profile/saved-addresses/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          address: destinationAddress,
+          nickname: newAddressNickname,
+          latitude: destinationCoordinates.lat,
+          longitude: destinationCoordinates.lng
+        }),
+      });
+      if (response.ok) {
+        setNewAddressNickname("");
+        fetchSavedAddresses();
+      }
+    } catch (err) {
+      console.error("Error saving address:", err);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/profile/saved-addresses/${addressId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (response.ok) {
+        fetchSavedAddresses();
+      }
+    } catch (err) {
+      console.error("Error deleting address:", err);
+    }
+  };
+
+  const handleAddressSelect = (address) => {
+    setDestinationAddress(address.address);
+    setDestinationCoordinates({ lat: address.latitude, lng: address.longitude });
+  };
+
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -353,6 +418,83 @@ const RouteEstimatorWithFields = () => {
           <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
             Open in Uber
           </Button>
+        </Box>
+      </Box>
+
+      {/* Saved Addresses Overlay */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          width: "20%",
+          bgcolor: "white",
+          p: 2,
+          borderRadius: 1,
+          boxShadow: 3,
+          zIndex: 1000,
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          Saved Addresses
+        </Typography>
+
+        {/* Add New Address */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="Nickname"
+            variant="outlined"
+            fullWidth
+            value={newAddressNickname}
+            onChange={(e) => setNewAddressNickname(e.target.value)}
+            sx={{ mb: 1 }}
+          />
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleSaveCurrentAddress}
+            disabled={!newAddressNickname || !destinationAddress}
+          >
+            Save Current Destination
+          </Button>
+        </Box>
+
+        {/* Saved Addresses List */}
+        <Box sx={{ maxHeight: "300px", overflow: "auto" }}>
+          {savedAddresses.map((address) => (
+            <Paper
+              key={address.id}
+              sx={{
+                p: 1,
+                mb: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                "&:hover": { backgroundColor: "#f5f5f5" },
+              }}
+              onClick={() => handleAddressSelect(address)}
+            >
+              <Box>
+                <Typography variant="subtitle1">{address.nickname}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {address.address}
+                </Typography>
+              </Box>
+              {address.id !== "home" && (
+                <Button
+                  size="small"
+                  color="error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteAddress(address.id);
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
+            </Paper>
+          ))}
         </Box>
       </Box>
     </Box>

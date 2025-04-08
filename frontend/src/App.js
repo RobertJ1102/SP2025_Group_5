@@ -9,6 +9,7 @@ import { Container, Typography } from "@mui/material";
 import ChangePasswordPage from "./components/ChangePasswordPage";
 import Header from "./components/Header";
 import ProfilePage from "./components/ProfilePage/ProfilePage";
+import { TextField, Button, Box, Alert, Paper } from "@mui/material";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,7 +40,7 @@ function App() {
   }
 
   return (
-    <Container sx={{ paddingTop: "64px" }}>
+    <Box sx={{ paddingTop: "64px", width: "100%", overflowX: "hidden" }}>
       {user ? (
         <>
           <Header onLogout={handleLogout} />
@@ -58,7 +59,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Routes>
       )}
-    </Container>
+    </Box>
   );
 }
 

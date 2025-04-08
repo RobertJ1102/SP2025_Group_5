@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography } from "@mui/material";
 import WelcomeModal from "./WelcomeModal";
 import RouteEstimatorWithFields from "./RouteEstimatorWithFields";
 
@@ -21,13 +20,7 @@ const HomePage = () => {
   return (
     <>
       <WelcomeModal open={showWelcome} onClose={handleCloseWelcome} />
-      {/* Remove or adjust the Container and remove Paper to let the UI expand */}
-      <Container maxWidth="xl" disableGutters sx={{ mt: 0, mb: 0 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          FareFinder
-        </Typography>
         <RouteEstimatorWithFields />
-      </Container>
     </>
   );
 };

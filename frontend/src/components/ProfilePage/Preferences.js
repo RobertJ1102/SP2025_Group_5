@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Box, Button, TextField, Stack } from '@mui/material';
-import './Info.css';
+import React, { useEffect, useState } from "react";
+import { Typography, Box, Button, TextField, Stack } from "@mui/material";
+import "./Info.css";
 
 function Preferences() {
   const [preferences, setPreferences] = useState(null);
@@ -12,13 +12,13 @@ function Preferences() {
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/profile/preferences', {
-          method: 'GET',
-          credentials: 'include',
+        const response = await fetch("api/profile/preferences", {
+          method: "GET",
+          credentials: "include",
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch preferences');
+          throw new Error("Failed to fetch preferences");
         }
 
         const data = await response.json();
@@ -45,17 +45,17 @@ function Preferences() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/profile/preferencesupdate', {
-        method: 'PUT',
+      const response = await fetch("api/profile/preferencesupdate", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(editData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update preferences');
+        throw new Error("Failed to update preferences");
       }
 
       const updatedData = await response.json();
@@ -76,7 +76,9 @@ function Preferences() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h4" className="title">Preferences</Typography>
+      <Typography variant="h4" className="title">
+        Preferences
+      </Typography>
       {isEditing ? (
         <Stack spacing={2} className="text-field-container">
           <TextField
@@ -99,8 +101,12 @@ function Preferences() {
         </Stack>
       ) : (
         <Stack spacing={2}>
-          <Typography variant="body1" className="detail">Search Range: {preferences.search_range}</Typography>
-          <Typography variant="body1" className="detail">Price Range: {preferences.price_range}</Typography>
+          <Typography variant="body1" className="detail">
+            Search Range: {preferences.search_range}
+          </Typography>
+          <Typography variant="body1" className="detail">
+            Price Range: {preferences.price_range}
+          </Typography>
           <Button variant="outlined" onClick={handleEditToggle} className="button">
             Edit
           </Button>

@@ -18,7 +18,7 @@ const FareInputComponent = () => {
           const { latitude, longitude } = position.coords;
           setPickupCoordinates({ lat: latitude, lng: longitude });
           try {
-            const response = await fetch(`http://127.0.0.1:8000/reverse_geocode?lat=${latitude}&lng=${longitude}`);
+            const response = await fetch(`api/reverse_geocode?lat=${latitude}&lng=${longitude}`);
             if (!response.ok) throw new Error("Failed to retrieve address");
             const data = await response.json();
             if (data.results && data.results[0]) {
@@ -45,9 +45,7 @@ const FareInputComponent = () => {
     setLoading(true);
     try {
       // Use internal API to geocode the destination address
-      const destResponse = await fetch(
-        `http://127.0.0.1:8000/api/geocode?address=${encodeURIComponent(destinationAddress)}`
-      );
+      const destResponse = await fetch(`api/api/geocode?address=${encodeURIComponent(destinationAddress)}`);
       if (!destResponse.ok) {
         throw new Error("Failed to geocode destination address");
       }
@@ -64,7 +62,7 @@ const FareInputComponent = () => {
           end_lon: lng,
         });
 
-        const apiResponse = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`);
+        const apiResponse = await fetch(`api/uber/best-uber-fare/?${queryParams.toString()}`);
         if (!apiResponse.ok) {
           throw new Error("Fare API call failed");
         }

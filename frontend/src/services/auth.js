@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "api";
 
 export const login = async (email, password) => {
   try {
@@ -24,7 +24,7 @@ export const logout = async () => {
 
 export async function getCurrentUser() {
   try {
-    const response = await fetch("http://127.0.0.1:8000/auth/me", {
+    const response = await fetch("api/auth/me", {
       method: "GET",
       credentials: "include", // Critical for cookies
     });

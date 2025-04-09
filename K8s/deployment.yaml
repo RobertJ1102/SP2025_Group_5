@@ -87,14 +87,45 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: farefinder-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx
   rules:
     - http:
         paths:
           - pathType: Prefix
-            path: /
+            path: /api
             backend:
               service:
                 name: farefinder-backend
                 port:
                   number: 8000
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: farefinder-frontend
+                port:
+                  number: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: farefinder-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: farefinder-frontend
+  template:
+    metadata:
+      labels:
+        app: farefinder-frontend
+    spec:
+      containers:
+        - name: farefinder-frontend
+          image: farefinder_frontend:1.0.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80

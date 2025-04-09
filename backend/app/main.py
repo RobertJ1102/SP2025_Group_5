@@ -4,7 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import router as api_router
 from app.database import init_db
 
-app = FastAPI()
+app = FastAPI(
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+    root_path="/api"
+)
 
 # start db
 init_db()

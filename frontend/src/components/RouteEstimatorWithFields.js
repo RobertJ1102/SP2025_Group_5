@@ -21,7 +21,7 @@ const RouteEstimatorWithFields = () => {
   // Prefill pickup coordinates and address when location is available
   useEffect(() => {
     if (location && !pickupCoordinates) {
-      fetch(`api/reverse_geocode?lat=${location[1]}&lng=${location[0]}`)
+      fetch(`/api/reverse_geocode?lat=${location[1]}&lng=${location[0]}`)
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -36,7 +36,7 @@ const RouteEstimatorWithFields = () => {
   // Map callbacks (receiving [lng, lat] arrays)
   const handleSetPickup = (lonLat) => {
     setPickupCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fetch(`api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+    fetch(`/api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
       .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
@@ -48,7 +48,7 @@ const RouteEstimatorWithFields = () => {
 
   const handleSetDestination = (lonLat) => {
     setDestinationCoordinates({ lat: lonLat[1], lng: lonLat[0] });
-    fetch(`api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
+    fetch(`/api/reverse_geocode?lat=${lonLat[1]}&lng=${lonLat[0]}`)
       .then((res) => res.json())
       .then((response) => {
         if (response.results && response.results[0]) {
@@ -61,7 +61,7 @@ const RouteEstimatorWithFields = () => {
   // Update coordinates from text input using internal geocoding API.
   const updatePickupFromText = () => {
     if (pickupAddress) {
-      fetch(`api/geocode?address=${encodeURIComponent(pickupAddress)}`)
+      fetch(`/api/geocode?address=${encodeURIComponent(pickupAddress)}`)
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -75,7 +75,7 @@ const RouteEstimatorWithFields = () => {
 
   const updateDestinationFromText = () => {
     if (destinationAddress) {
-      fetch(`api/geocode?address=${encodeURIComponent(destinationAddress)}`)
+      fetch(`/api/geocode?address=${encodeURIComponent(destinationAddress)}`)
         .then((res) => res.json())
         .then((response) => {
           if (response.results && response.results[0]) {
@@ -102,7 +102,7 @@ const RouteEstimatorWithFields = () => {
       end_lon: destinationCoordinates.lng,
     });
     try {
-      const response = await fetch(`api/uber/best-uber-fare/?${queryParams.toString()}`);
+      const response = await fetch(`/api/uber/best-uber-fare/?${queryParams.toString()}`);
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
       setRouteEstimation(data);
@@ -126,7 +126,7 @@ const RouteEstimatorWithFields = () => {
       latitude_end: destinationCoordinates.lat,
     };
     try {
-      const response = await fetch("api/profile/history/add", {
+      const response = await fetch("/api/profile/history/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -177,7 +177,7 @@ const RouteEstimatorWithFields = () => {
       return;
     }
     try {
-      let url = `api/autocomplete?input=${encodeURIComponent(input)}`;
+      let url = `/api/autocomplete?input=${encodeURIComponent(input)}`;
       if (location) {
         url += `&lat=${location[1]}&lng=${location[0]}`;
       }
@@ -217,7 +217,7 @@ const RouteEstimatorWithFields = () => {
 
   const fetchSavedAddresses = async () => {
     try {
-      const response = await fetch("api/profile/saved-addresses", {
+      const response = await fetch("/api/profile/saved-addresses", {
         credentials: "include",
       });
       if (response.ok) {
@@ -233,7 +233,7 @@ const RouteEstimatorWithFields = () => {
     if (!destinationAddress || !newAddressNickname) return;
 
     try {
-      const response = await fetch("api/profile/saved-addresses/add", {
+      const response = await fetch("/api/profile/saved-addresses/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -255,7 +255,7 @@ const RouteEstimatorWithFields = () => {
 
   const handleDeleteAddress = async (addressId) => {
     try {
-      const response = await fetch(`api/profile/saved-addresses/${addressId}`, {
+      const response = await fetch(`/api/profile/saved-addresses/${addressId}`, {
         method: "DELETE",
         credentials: "include",
       });

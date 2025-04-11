@@ -10,7 +10,7 @@ function History() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch("api/profile/history", {
+        const response = await fetch("/api/profile/history", {
           method: "GET",
           credentials: "include",
         });

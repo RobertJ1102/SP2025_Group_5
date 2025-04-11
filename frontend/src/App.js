@@ -5,11 +5,21 @@ import LoginPage from "./components/LoginPage";
 import CreateAccountPage from "./components/CreateAccountPage";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import HomePage from "./components/HomePage";
-import { Container, Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import ChangePasswordPage from "./components/ChangePasswordPage";
 import Header from "./components/Header";
 import ProfilePage from "./components/ProfilePage/ProfilePage";
-import { TextField, Button, Box, Alert, Paper } from "@mui/material";
+import { TextField, Button, Alert, Paper } from "@mui/material";
+
+// ProtectedRoute: Renders children only if user is logged in, otherwise navigates to login.
+function ProtectedRoute({ user, children }) {
+  return user ? children : <Navigate to="/login" replace />;
+}
+
+// PublicRoute: Renders children only if no user is logged in, otherwise navigates to home.
+function PublicRoute({ user, children }) {
+  return user ? <Navigate to="/" replace /> : children;
+}
 
 function App() {
   const [user, setUser] = useState(null);
@@ -35,24 +45,71 @@ function App() {
 
   return (
     <Box sx={{ paddingTop: "64px", width: "100%", overflowX: "hidden" }}>
-      {user ? (
-        <>
-          <Header onLogout={handleLogout} />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="*" element={<Navigate to="/" />} />
-            <Route path="/change-password" element={<ChangePasswordPage />} />
-            <Route path="/profile/*" element={<ProfilePage />} />
-          </Routes>
-        </>
-      ) : (
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<CreateAccountPage />} />
-          <Route path="*" element={<Navigate to="/login" />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        </Routes>
-      )}
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute user={user}>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute user={user}>
+              <CreateAccountPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute user={user}>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          }
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute user={user}>
+              <>
+                <Header onLogout={handleLogout} />
+                <HomePage />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute user={user}>
+              <>
+                <Header onLogout={handleLogout} />
+                <ChangePasswordPage />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/*"
+          element={
+            <ProtectedRoute user={user}>
+              <>
+                <Header onLogout={handleLogout} />
+                <ProfilePage />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all fallback */}
+        <Route path="*" element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} />
+      </Routes>
     </Box>
   );
 }

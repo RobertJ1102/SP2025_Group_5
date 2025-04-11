@@ -16,7 +16,7 @@ function Info() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch("api/profile/info", {
+        const response = await fetch("/api/profile/info", {
           method: "GET",
           credentials: "include", // Include cookies in the request
         });
@@ -63,7 +63,7 @@ function Info() {
       return;
     }
     try {
-      const url = `api/autocomplete?input=${encodeURIComponent(input)}`;
+      const url = `/api/autocomplete?input=${encodeURIComponent(input)}`;
       const response = await fetch(url);
       const data = await response.json();
       if (data.predictions) {
@@ -84,7 +84,7 @@ function Info() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("api/profile/infoupdate", {
+      const response = await fetch("/api/profile/infoupdate", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

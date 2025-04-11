@@ -24,7 +24,7 @@ export const logout = async () => {
 
 export async function getCurrentUser() {
   try {
-    const response = await fetch("api/auth/me", {
+    const response = await fetch("/api/auth/me", {
       method: "GET",
       credentials: "include", // Critical for cookies
     });

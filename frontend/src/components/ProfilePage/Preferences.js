@@ -9,10 +9,11 @@ function Preferences() {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
 
+  
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
-        const response = await fetch("api/profile/preferences", {
+        const response = await fetch("/api/profile/preferences", {
           method: "GET",
           credentials: "include",
         });
@@ -45,7 +46,7 @@ function Preferences() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("api/profile/preferencesupdate", {
+      const response = await fetch("/api/profile/preferencesupdate", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

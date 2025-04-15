@@ -75,38 +75,94 @@ function Preferences() {
   }
 
   return (
-    <Stack spacing={3}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 4,
+      }}
+    >
       <Typography variant="h4" className="title">Preferences</Typography>
+
       {isEditing ? (
-        <Stack spacing={2} className="text-field-container">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            width: '100%',
+            maxWidth: '400px'
+          }}
+        >
           <TextField
             label="Search Range"
             name="search_range"
-            value={editData.search_range}
+            value={editData.search_range || ""}
             onChange={handleInputChange}
             className="detail"
+            placeholder="Enter Search Range (feet)"
+            fullWidth
           />
           <TextField
             label="Price Range"
             name="price_range"
-            value={editData.price_range}
+            value={editData.price_range || ""}
             onChange={handleInputChange}
             className="detail"
+            placeholder="Enter Price Range ($)"
+            fullWidth
           />
-          <Button variant="contained" color="primary" onClick={handleSave} className="button">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSave}
+            className="button"
+          >
             Save
           </Button>
-        </Stack>
+        </Box>
       ) : (
-        <Stack spacing={2}>
-          <Typography variant="body1" className="detail">Search Range: {preferences.search_range}</Typography>
-          <Typography variant="body1" className="detail">Price Range: {preferences.price_range}</Typography>
-          <Button variant="outlined" onClick={handleEditToggle} className="button">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            width: '100%',
+          }}
+        >
+          <Typography
+            variant="body1"
+            className="info-detail"
+            sx={{
+              textAlign: 'center',
+              color: preferences?.search_range ? 'text.primary' : 'text.secondary',
+            }}
+          >
+            Search Range: {preferences?.search_range ? `${preferences.search_range} feet` : 'Not Set'}
+          </Typography>
+          <Typography
+            variant="body1"
+            className="info-detail"
+            sx={{
+              textAlign: 'center',
+              color: preferences?.price_range ? 'text.primary' : 'text.secondary',
+            }}
+          >
+            Price Range: {preferences?.price_range ? `$${preferences.price_range}` : 'Not Set'}
+          </Typography>
+          <Button
+            variant="outlined"
+            onClick={handleEditToggle}
+            className="info-button"
+          >
             Edit
           </Button>
-        </Stack>
+        </Box>
       )}
-    </Stack>
+    </Box>
   );
 }
 

@@ -22,12 +22,13 @@ if GMAP_API_KEY is None:
 EARTH_RADIUS = 6378137
 
 @router.get("/best-uber-fare/")
-def get_best_uber_fare(start_lat: float, start_lon: float, end_lat: float, end_lon: float):
+def get_best_uber_fare(start_lat: float, start_lon: float, end_lat: float, end_lon: float, search_range: int = 500):
     """
     API Endpoint to find the best Uber fare by checking multiple nearby locations.
+    search_range: Maximum distance in feet to search for alternative pickup locations (default: 500 feet)
     """
     try:
-        best_fare = find_best_fare(start_lat, start_lon, end_lat, end_lon)
+        best_fare = find_best_fare(start_lat, start_lon, end_lat, end_lon, search_range)
         return best_fare
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -126,28 +127,37 @@ def process_location_uber(location, end_lat, end_lon):
         return (label, prices)
     return None
 
-def find_best_fare(start_lat, start_lon, end_lat, end_lon):
+def find_best_fare(start_lat, start_lon, end_lat, end_lon, search_range=500):
     """
     Finds the best Uber fare by checking the original location and nearby pickup spots in parallel.
+    search_range: Maximum distance in feet to search for alternative pickup locations
     """
+    # Convert search range from feet to meters
+    search_range_meters = search_range * 0.3048
+    
+    # Calculate the number of steps based on search range
+    # We'll search at 30% and 60% of the max range
+    step1 = int(search_range_meters * 0.3)
+    step2 = int(search_range_meters * 0.6)
+    
     locations = [
         (start_lat, start_lon, "Original"),
-        move_location(start_lat, start_lon, 91, "N") + ("N 300ft",),
-        move_location(start_lat, start_lon, 152, "N") + ("N 500ft",),
-        move_location(start_lat, start_lon, 91, "E") + ("E 300ft",),
-        move_location(start_lat, start_lon, 152, "E") + ("E 500ft",),
-        move_location(start_lat, start_lon, 91, "S") + ("S 300ft",),
-        move_location(start_lat, start_lon, 152, "S") + ("S 500ft",),
-        move_location(start_lat, start_lon, 91, "W") + ("W 300ft",),
-        move_location(start_lat, start_lon, 152, "W") + ("W 500ft",),
-        move_location(start_lat, start_lon, 91, "NE") + ("NE 300ft",),
-        move_location(start_lat, start_lon, 152, "NE") + ("NE 500ft",),
-        move_location(start_lat, start_lon, 91, "NW") + ("NW 300ft",),
-        move_location(start_lat, start_lon, 152, "NW") + ("NW 500ft",),
-        move_location(start_lat, start_lon, 91, "SE") + ("SE 300ft",),
-        move_location(start_lat, start_lon, 152, "SE") + ("SE 500ft",),
-        move_location(start_lat, start_lon, 91, "SW") + ("SW 300ft",),
-        move_location(start_lat, start_lon, 152, "SW") + ("SW 500ft",),
+        move_location(start_lat, start_lon, step1, "N") + (f"N {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "N") + (f"N {int(step2/0.3048)}ft",),
+        move_location(start_lat, start_lon, step1, "E") + (f"E {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "E") + (f"E {int(step2/0.3048)}ft",),
+        move_location(start_lat, start_lon, step1, "S") + (f"S {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "S") + (f"S {int(step2/0.3048)}ft",),
+        move_location(start_lat, start_lon, step1, "W") + (f"W {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "W") + (f"W {int(step2/0.3048)}ft",),
+        move_location(start_lat, start_lon, step1, "NE") + (f"NE {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "NE") + (f"NE {int(step2/0.3048)}ft",),
+        move_location(start_lat, start_lon, step1, "NW") + (f"NW {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "NW") + (f"NW {int(step2/0.3048)}ft",),
+        move_location(start_lat, start_lon, step1, "SE") + (f"SE {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "SE") + (f"SE {int(step2/0.3048)}ft",),
+        move_location(start_lat, start_lon, step1, "SW") + (f"SW {int(step1/0.3048)}ft",),
+        move_location(start_lat, start_lon, step2, "SW") + (f"SW {int(step2/0.3048)}ft",),
     ]
     
     best_price = None

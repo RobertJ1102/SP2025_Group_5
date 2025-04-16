@@ -60,13 +60,15 @@ def create_session(username: str):
 def verify_session(token: str):
     """ Verify the session token """
     try:
-        print("Verifying session....")
-        return serializer.loads(token, salt="session", max_age=3600)  # Session expires in 1 hour
-    except SignatureExpired:
-        # Handle expired session
+        print("Verifying session token:", token)
+        username = serializer.loads(token, salt="session", max_age=3600)
+        print("Decoded username:", username)
+        return username
+    except SignatureExpired as e:
+        print("Session expired:", e)
         return None
-    except BadData:
-        # Handle invalid or tampered session
+    except BadData as e:
+        print("Bad token data:", e)
         return None
 
 @router.post("/login")
@@ -82,8 +84,8 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
         key="session",
         value=session_token,
         httponly=True,
-        secure=True,
-        samesite="None",
+        secure=False,      # **Disable Secure for HTTP**
+        samesite="lax",    # Use lax to allow cookie in top-level navigation
         max_age=3600,
         path="/",
     )
@@ -105,6 +107,10 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     username = verify_session(session_token)
+    print  (f"Session token: {session_token}")
+    print  (f"Username: {username}")
+    print  (f"Request: {request}")
+    print  (f"Request cookies: {request.cookies}")
     if not username:
         raise HTTPException(status_code=401, detail="Invalid session")
     user = db.query(User).filter(User.username == username).first()

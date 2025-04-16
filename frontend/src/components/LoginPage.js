@@ -1,13 +1,6 @@
 import React, { useState } from "react";
-import {
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-  Paper,
-} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Container, TextField, Button, Typography, Box, Alert, Paper } from "@mui/material";
 import "../styles/AuthPages.css";
 import logo from "../assets/logo.png";
 
@@ -16,6 +9,8 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -28,7 +23,7 @@ function LoginPage() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -52,11 +47,7 @@ function LoginPage() {
         window.location.href = "/";
       } else {
         const errorDetail = data.detail || "Login failed";
-        setError(
-          typeof errorDetail === "string"
-            ? errorDetail
-            : JSON.stringify(errorDetail)
-        );
+        setError(typeof errorDetail === "string" ? errorDetail : JSON.stringify(errorDetail));
       }
     } catch (err) {
       setError("Failed to connect to the server.");
@@ -69,11 +60,7 @@ function LoginPage() {
         <Paper elevation={3} className="auth-paper">
           <Box sx={{ textAlign: "center" }}>
             <Box sx={{ mb: 3 }}>
-              <img
-                src={logo}
-                alt="FareFinder Logo"
-                style={{ maxWidth: "200px", height: "auto" }}
-              />
+              <img src={logo} alt="FareFinder Logo" style={{ maxWidth: "200px", height: "auto" }} />
             </Box>
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
@@ -108,30 +95,14 @@ function LoginPage() {
                 variant="outlined"
                 className="auth-textfield"
               />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
+              <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                 Login
               </Button>
-              <Box
-                sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
-              >
-                <Button
-                  variant="text"
-                  color="primary"
-                  onClick={() => (window.location.href = "/forgot-password")}
-                >
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+                <Button variant="text" color="primary" onClick={() => navigate("/forgot-password")}>
                   Forgot Password?
                 </Button>
-                <Button
-                  variant="text"
-                  color="primary"
-                  onClick={() => (window.location.href = "/register")}
-                >
+                <Button variant="text" color="primary" onClick={() => navigate("/register")}>
                   Create Account
                 </Button>
               </Box>

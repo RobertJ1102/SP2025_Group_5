@@ -1,0 +1,40 @@
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: farefinder-cert
+spec:
+  domains:
+    - farefinder.syntale.net
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: farefinder-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: farefinder-ip
+    networking.gke.io/managed-certificates: farefinder-cert
+spec:
+  rules:
+  - host: farefinder.syntale.net
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: farefinder-backend
+            port:
+              number: 8000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: farefinder-frontend
+            port:
+              number: 80
+  tls:
+  - hosts:
+      - farefinder.syntale.net
+    secretName: farefinder-tls  # This field is ignored with Google-managed certificates but can be included for clarity.

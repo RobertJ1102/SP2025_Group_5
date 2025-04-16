@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Box, Alert, Paper } from "@mui/material";
-import '../styles/AuthPages.css';
+import "../styles/AuthPages.css";
 import logo from "../assets/logo.png";
 
 function CreateAccountPage() {
@@ -28,7 +28,7 @@ function CreateAccountPage() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
@@ -53,7 +53,7 @@ function CreateAccountPage() {
         <Paper elevation={3} className="auth-paper">
           <Box sx={{ textAlign: "center" }}>
             <Box sx={{ mb: 3 }}>
-              <img src={logo} alt="FareFinder Logo" style={{ maxWidth: '200px', height: 'auto' }} />
+              <img src={logo} alt="FareFinder Logo" style={{ maxWidth: "200px", height: "auto" }} />
             </Box>
             {error && <Alert severity="error">{error}</Alert>}
             {success && <Alert severity="success">Account created! You can now log in.</Alert>}
@@ -105,13 +105,7 @@ function CreateAccountPage() {
               <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                 Register
               </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                fullWidth
-                sx={{ mt: 1 }}
-                onClick={() => navigate("/login")}
-              >
+              <Button variant="outlined" color="primary" fullWidth sx={{ mt: 1 }} onClick={() => navigate("/login")}>
                 Back to Login
               </Button>
             </form>

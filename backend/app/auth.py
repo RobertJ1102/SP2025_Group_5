@@ -26,28 +26,26 @@ def hash_password(password: str):
 @router.post("/register")
 def register(user: UserCreate, response: Response, db: Session = Depends(get_db)):
     """Registers a new user."""
-    # Check if email exists
+    # Check if user exists by email
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-
     # Check if username exists
     existing_username = db.query(User).filter(User.username == user.username).first()
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already taken")
-
-    # Create new user (store password as a hash)
+    
+    # Create new user with a hashed password
     new_user = User(username=user.username, email=user.email, password=hash_password(user.password))
     db.add(new_user)
     db.commit()
-    # Use username for session creation to match our login and /me endpoints
+    # Create session token using the username for consistency
     session_token = create_session(new_user.username)
     response.set_cookie(
         key="session",
         value=session_token,
-        httponly=True,
-        secure=False,       # For testing over HTTP; switch to True when using HTTPS
-        samesite="lax",     # Lax works well for top-level navigation on HTTP
+        secure=True,      # Use False for HTTP testing; set to True when using HTTPS
+        samesite="None",    # Lax is suitable for HTTP and most navigation scenarios
         max_age=3600,
         path="/",
     )
@@ -85,15 +83,14 @@ def login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.username == user.username).first()
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
-
+    
     # Create session token based on username (consistent with registration)
     session_token = create_session(db_user.username)
     response.set_cookie(
         key="session",
         value=session_token,
-        httponly=True,
-        secure=False,      # For HTTP testing
-        samesite="lax",    # Lax mode works for HTTP; update for HTTPS in production
+        secure=True,      # For HTTP testing; update this when deploying with TLS
+        samesite="None",    # Use lax to allow the cookie on HTTP connections
         max_age=3600,
         path="/",
     )
@@ -111,13 +108,14 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     session_token = request.cookies.get("session")
     if not session_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
+    
     username = verify_session(session_token)
     print(f"Session token: {session_token}")
     print(f"Decoded username: {username}")
     print(f"Request cookies: {request.cookies}")
     if not username:
         raise HTTPException(status_code=401, detail="Invalid session")
-    # Query based on username since that is what we use in sessions
+    # Query based on username since our token is created from the username
     user = db.query(User).filter(User.username == username).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -129,7 +127,7 @@ def generate_random_password(length=12):
     characters = string.ascii_letters + string.digits + "!@#$%^&*()"
     return ''.join(random.choice(characters) for i in range(length))
 
-# Function to send email for password reset
+# Function to send password reset email
 async def send_reset_email(email: str, new_password: str):
     """Send password reset email"""
     message = MessageSchema(
@@ -155,10 +153,12 @@ async def reset_password(
     user = db.query(User).filter(User.email == request.email).first()
     if not user:
         raise HTTPException(status_code=404, detail="Email not found")
+    
     new_password = generate_random_password()
     hashed_password = pwd_context.hash(new_password)
     user.password = hashed_password
     db.commit()
+    
     try:
         background_tasks.add_task(send_reset_email, request.email, new_password)
         return {"message": "A new password has been sent to your email."}

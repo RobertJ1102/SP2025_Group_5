@@ -1,15 +1,21 @@
-# Use Node.js 22 base image
-FROM node:22
-
-# Set working directory
+# Stage 1: Build the React app
+FROM node:22 as build
 WORKDIR /app
 
-# Copy package.json and install dependencies
-COPY package.json .
+COPY package.json ./
+COPY package-lock.json ./
 RUN npm install
 
-# Copy all frontend files
 COPY . .
+RUN npm run build
 
-# Start React development server
-CMD ["npm", "start"]
+# Stage 2: Serve with Nginx
+FROM nginx:alpine
+
+# Copy the build output
+COPY --from=build /app/build /usr/share/nginx/html
+COPY public /usr/share/nginx/html/public
+
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

@@ -9,6 +9,7 @@ import { Container, Typography } from "@mui/material";
 import ChangePasswordPage from "./components/ChangePasswordPage";
 import Header from "./components/Header";
 import ProfilePage from "./components/ProfilePage/ProfilePage";
+import HelpPage from "./components/HelpPage";
 import { TextField, Button, Box, Alert, Paper } from "@mui/material";
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
             <Route path="/profile/*" element={<ProfilePage />} />
+            <Route path="/help" element={<HelpPage />} />
           </Routes>
         </>
       ) : (
@@ -57,6 +59,7 @@ function App() {
           <Route path="/register" element={<CreateAccountPage />} />
           <Route path="*" element={<Navigate to="/login" />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/help" element={<HelpPage />} />
         </Routes>
       )}
     </Box>

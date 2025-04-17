@@ -9,7 +9,8 @@ import { Typography, Box } from "@mui/material";
 import ChangePasswordPage from "./components/ChangePasswordPage";
 import Header from "./components/Header";
 import ProfilePage from "./components/ProfilePage/ProfilePage";
-import { TextField, Button, Alert, Paper } from "@mui/material";
+import HelpPage from "./components/HelpPage";
+import { TextField, Button, Alert, Paper, Bos } from "@mui/material";
 
 // ProtectedRoute: Renders children only if user is logged in, otherwise navigates to login.
 function ProtectedRoute({ user, children }) {
@@ -60,6 +61,14 @@ function App() {
           element={
             <PublicRoute user={user}>
               <CreateAccountPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <PublicRoute user={user}>
+              <HelpPage />
             </PublicRoute>
           }
         />

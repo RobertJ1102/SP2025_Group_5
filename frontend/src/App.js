@@ -41,28 +41,30 @@ function App() {
   }
 
   return (
-    <Box sx={{ paddingTop: "64px", width: "100%", overflowX: "hidden" }}>
-      {user ? (
-        <>
-          <Header onLogout={handleLogout} />
+    <>
+      <Box sx={{ paddingTop: "64px", width: "100%", overflowX: "hidden" }}>
+        {user ? (
+          <>
+            <Header onLogout={handleLogout} />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="*" element={<Navigate to="/" />} />
+              <Route path="/change-password" element={<ChangePasswordPage />} />
+              <Route path="/profile/*" element={<ProfilePage />} />
+              <Route path="/help" element={<HelpPage />} />
+            </Routes>
+          </>
+        ) : (
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="*" element={<Navigate to="/" />} />
-            <Route path="/change-password" element={<ChangePasswordPage />} />
-            <Route path="/profile/*" element={<ProfilePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<CreateAccountPage />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/help" element={<HelpPage />} />
           </Routes>
-        </>
-      ) : (
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<CreateAccountPage />} />
-          <Route path="*" element={<Navigate to="/login" />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/help" element={<HelpPage />} />
-        </Routes>
-      )}
-    </Box>
+        )}
+      </Box>
+    </>
   );
 }
 

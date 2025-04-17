@@ -81,7 +81,10 @@ function Header({ onLogout }) {
         <Box sx={{ flexGrow: 1 }} />
         <Button
           color="inherit"
-          onClick={onLogout}
+          onClick={() => {
+            onLogout();
+            navigate("/");
+          }}
           sx={{
             textTransform: "none",
             fontWeight: 600,

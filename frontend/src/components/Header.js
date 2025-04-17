@@ -14,6 +14,10 @@ function Header({ onLogout }) {
     navigate("/profile");
   };
 
+  const handleHelpClick = () => {
+    navigate("/help");
+  };
+
   return (
     <AppBar
       position="fixed"
@@ -62,10 +66,25 @@ function Header({ onLogout }) {
         >
           Profile
         </Button>
+        <Button
+          color="inherit"
+          onClick={handleHelpClick}
+          sx={{
+            textTransform: "none",
+            fontWeight: 600,
+            fontSize: "1.1rem",
+            fontFamily: '"Inter", sans-serif',
+          }}
+        >
+          Help
+        </Button>
         <Box sx={{ flexGrow: 1 }} />
         <Button
           color="inherit"
-          onClick={onLogout}
+          onClick={() => {
+            onLogout();
+            navigate("/");
+          }}
           sx={{
             textTransform: "none",
             fontWeight: 600,

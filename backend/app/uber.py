@@ -68,11 +68,13 @@ def find_top_fares(start_lat, start_lon, end_lat, end_lon, limit, search_range=5
     """
     Finds the top `limit` cheapest Uber fares from original and nearby pickup spots.
     Distances are specified in feet, but converted to meters under the hood.
+    Each option now includes 'pickup_lat' and 'pickup_lon'.
     """
     directions   = ("N","E","S","W","NE","NW","SE","SW")
     distances_ft = [int(search_range * 0.5), int(search_range)]
     distances_m  = [round(ft * 0.3048) for ft in distances_ft]
 
+    # build a list of (lat, lon, label) tuples
     locations = [
         (start_lat, start_lon, "Original"),
         *[
@@ -85,26 +87,35 @@ def find_top_fares(start_lat, start_lon, end_lat, end_lon, limit, search_range=5
 
     all_results = []
     with ThreadPoolExecutor(max_workers=len(locations)) as executor:
-        futures = [
-            executor.submit(process_location_uber, loc, end_lat, end_lon)
+        # map each Future back to its original loc tuple
+        future_to_loc = {
+            executor.submit(process_location_uber, loc, end_lat, end_lon): loc
             for loc in locations
-        ]
-        for future in as_completed(futures):
+        }
+
+        for future in as_completed(future_to_loc):
+            loc = future_to_loc[future]
+            lat, lon, label = loc
+
             result = future.result()
             if not result:
                 continue
-            label, prices = result
+
+            _, prices = result
             for ride in prices:
                 price = ride.get("low_estimate")
                 if price is None:
                     continue
+
                 all_results.append({
-                    "location":  label,
-                    "price":     price,
-                    "ride_type": ride.get("display_name"),
+                    "location":    label,
+                    "pickup_lat":  lat,
+                    "pickup_lon":  lon,
+                    "price":       price,
+                    "ride_type":   ride.get("display_name"),
                 })
 
-    # sort by price ascending, take top `limit`
+    # sort ascending and take the top `limit`
     all_results.sort(key=lambda x: x["price"])
     return all_results[:limit]
 

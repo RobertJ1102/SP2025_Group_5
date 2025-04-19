@@ -18,6 +18,7 @@ const RouteEstimatorWithFields = () => {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [newAddressNickname, setNewAddressNickname] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("");
+  const [userPreferences, setUserPreferences] = useState(null);
 
   // Prefill pickup coordinates and address when location is available
   useEffect(() => {
@@ -88,6 +89,24 @@ const RouteEstimatorWithFields = () => {
     }
   };
 
+  // Fetch user preferences on component mount
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/profile/preferences', {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUserPreferences(data);
+        }
+      } catch (err) {
+        console.error('Error fetching preferences:', err);
+      }
+    };
+    fetchPreferences();
+  }, []);
+
   // Estimate route via internal API
   const estimateRoute = async () => {
     if (!pickupCoordinates || !destinationCoordinates) {
@@ -96,12 +115,18 @@ const RouteEstimatorWithFields = () => {
     }
     setLoading(true);
     setRouteEstimation(null);
+    
+    // Get search range from preferences, default to 500 feet if not set
+    const searchRange = userPreferences?.search_range ? parseInt(userPreferences.search_range) : 500;
+    
     const queryParams = new URLSearchParams({
       start_lat: pickupCoordinates.lat,
       start_lon: pickupCoordinates.lng,
       end_lat: destinationCoordinates.lat,
       end_lon: destinationCoordinates.lng,
+      search_range: searchRange
     });
+    
     try {
       const response = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams}&limit=3`);
       if (!response.ok) throw new Error("Failed to estimate route");

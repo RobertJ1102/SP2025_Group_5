@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, TextField, Button, Typography, Paper, MenuItem, Select, IconButton } from "@mui/material";
+import { Box, TextField, Button, Typography, Paper, Alert, MenuItem, Select, IconButton } from "@mui/material";
 import GoogleMap from "./GoogleMap";
 import useUserLocation from "../hooks/useUserLocation";
 
@@ -9,7 +9,6 @@ const RouteEstimatorWithFields = () => {
   const [destinationAddress, setDestinationAddress] = useState("");
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
-  const [routeEstimation, setRouteEstimation] = useState(null);
   const [fareOptions, setFareOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeSelection, setActiveSelection] = useState("auto");
@@ -19,6 +18,8 @@ const RouteEstimatorWithFields = () => {
   const [newAddressNickname, setNewAddressNickname] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("");
   const [userPreferences, setUserPreferences] = useState(null);
+  const [errorToast, setErrorToast] = useState("");
+  const [selectedIdx, setSelectedIdx] = useState(0);
 
   // Prefill pickup coordinates and address when location is available
   useEffect(() => {
@@ -93,15 +94,15 @@ const RouteEstimatorWithFields = () => {
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/profile/preferences', {
-          credentials: 'include',
+        const response = await fetch("http://127.0.0.1:8000/profile/preferences", {
+          credentials: "include",
         });
         if (response.ok) {
           const data = await response.json();
           setUserPreferences(data);
         }
       } catch (err) {
-        console.error('Error fetching preferences:', err);
+        console.error("Error fetching preferences:", err);
       }
     };
     fetchPreferences();
@@ -109,31 +110,36 @@ const RouteEstimatorWithFields = () => {
 
   // Estimate route via internal API
   const estimateRoute = async () => {
+    setErrorToast("");
+
     if (!pickupCoordinates || !destinationCoordinates) {
+      setErrorToast("Pickup and destination must be set!");
       console.error("Both pickup and destination must be set");
       return;
     }
     setLoading(true);
-    setRouteEstimation(null);
-    
+
     // Get search range from preferences, default to 500 feet if not set
     const searchRange = userPreferences?.search_range ? parseInt(userPreferences.search_range) : 500;
-    
+
     const queryParams = new URLSearchParams({
       start_lat: pickupCoordinates.lat,
       start_lon: pickupCoordinates.lng,
       end_lat: destinationCoordinates.lat,
       end_lon: destinationCoordinates.lng,
-      search_range: searchRange
+      search_range: searchRange,
+      limit: 3,
     });
-    
+
     try {
-      const response = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams}&limit=3`);
+      const url = `http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
       setFareOptions(data.options || []);
     } catch (err) {
       console.error("Route estimation error:", err);
+      setErrorToast("Sorry, something went wrong fetching fares.");
     }
     setLoading(false);
   };
@@ -165,17 +171,15 @@ const RouteEstimatorWithFields = () => {
     }
   };
 
-  const handleOpenUber = () => {
-    if (!pickupCoordinates || !destinationCoordinates) {
-      console.error("Both pickup and destination must be set to open in Uber");
-      return;
-    }
+  const handleOpenUberFor = (opt) => {
+    if (!opt) return;
     const CLIENT_ID = "bGx0iZIMpiDhwEoOIQX_CZNek5LBJoAfBej5JmEJ";
     const PRODUCT_ID = "2d1d002b-d4d0-4411-98e1-673b244878b2";
+
     const pickupData = {
-      latitude: pickupCoordinates.lat,
-      longitude: pickupCoordinates.lng,
-      addressLine1: pickupAddress,
+      latitude: opt.pickup_lat,
+      longitude: opt.pickup_lon,
+      addressLine1: opt.location,
       addressLine2: "",
     };
     const dropData = {
@@ -184,16 +188,17 @@ const RouteEstimatorWithFields = () => {
       addressLine1: destinationAddress,
       addressLine2: "",
     };
-    const uberDeepLink =
-      `https://m.uber.com/looking?client_id=${CLIENT_ID}` +
+
+    const url =
+      `https://m.uber.com/looking?` +
+      `client_id=${CLIENT_ID}` +
       `&pickup=${encodeURIComponent(JSON.stringify(pickupData))}` +
       `&drop[0]=${encodeURIComponent(JSON.stringify(dropData))}` +
       `&product_id=${PRODUCT_ID}`;
-    window.open(uberDeepLink, "_blank");
-  };
 
-  const handleOpenUberAndAddHistory = () => {
-    handleOpenUber();
+    console.log("Opening Uber with URL:", url);
+
+    window.open(url, "_blank");
     addRouteToHistory();
   };
 
@@ -332,6 +337,12 @@ const RouteEstimatorWithFields = () => {
           Route Estimator
         </Typography>
 
+        {errorToast && (
+          <Alert severity="warning" onClose={() => setErrorToast("")} sx={{ mb: 2 }}>
+            {errorToast}
+          </Alert>
+        )}
+
         {/* Pickup Field with Suggestions */}
         <Box sx={{ mb: 3, position: "relative" }}>
           <TextField
@@ -434,17 +445,20 @@ const RouteEstimatorWithFields = () => {
             {fareOptions.map((opt, i) => (
               <Paper
                 key={i}
-                elevation={i === 0 ? 4 : 1}
+                onClick={() => setSelectedIdx(i)}
+                elevation={selectedIdx === i ? 6 : 1}
                 sx={{
                   p: 2,
                   mb: 1,
-                  borderLeft: i === 0 ? "4px solid" : "none",
+                  cursor: "pointer",
+                  // thick colored border for the selected card
+                  borderLeft: selectedIdx === i ? "4px solid" : "none",
                   borderColor: (theme) => theme.palette.primary.main,
                 }}
               >
                 <Typography variant="subtitle1">
                   {i + 1}. {opt.ride_type}
-                  {i === 0 && " – Best"}
+                  {selectedIdx === i && " – Selected"}
                 </Typography>
                 <Typography variant="body2">
                   <strong>Location:</strong> {opt.location}
@@ -459,7 +473,12 @@ const RouteEstimatorWithFields = () => {
 
         {/* Open in Uber Button */}
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
+          <Button
+            onClick={() => handleOpenUberFor(fareOptions[selectedIdx])}
+            disabled={fareOptions.length === 0}
+            variant="contained"
+            fullWidth
+          >
             Open in Uber
           </Button>
         </Box>

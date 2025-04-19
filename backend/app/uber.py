@@ -64,25 +64,22 @@ def get_uber_access_token():
         detail=f"Failed to get Uber access token: {response.json()}"
     )
 
-def find_top_fares(start_lat, start_lon, end_lat, end_lon, limit):
+def find_top_fares(start_lat, start_lon, end_lat, end_lon, limit, search_range=500):
     """
     Finds the top `limit` cheapest Uber fares from original and nearby pickup spots.
     Distances are specified in feet, but converted to meters under the hood.
     """
-    directions     = ("N","E","S","W","NE","NW","SE","SW")
-    distances_ft   = (300, 500)
+    directions   = ("N","E","S","W","NE","NW","SE","SW")
+    distances_ft = [int(search_range * 0.5), int(search_range)]
+    distances_m  = [round(ft * 0.3048) for ft in distances_ft]
+
     locations = [
         (start_lat, start_lon, "Original"),
         *[
-            # convert feet → meters (1 ft ≈ 0.3048 m), then label with the original feet
-            move_location(
-                start_lat,
-                start_lon,
-                round(ft * 0.3048),
-                dir
-            ) + (f"{dir} {ft}ft",)
+            move_location(start_lat, start_lon, meters, dir)
+            + (f"{dir} {feet}ft",)
             for dir in directions
-            for ft  in distances_ft
+            for meters, feet in zip(distances_m, distances_ft)
         ],
     ]
 
@@ -102,7 +99,7 @@ def find_top_fares(start_lat, start_lon, end_lat, end_lon, limit):
                 if price is None:
                     continue
                 all_results.append({
-                    "location":  label,        # e.g. "N 300ft"
+                    "location":  label,
                     "price":     price,
                     "ride_type": ride.get("display_name"),
                 })

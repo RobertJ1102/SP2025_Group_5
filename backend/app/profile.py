@@ -35,6 +35,8 @@ def get_user_info(request: Request, db: Session = Depends(get_db)):
     return {
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "username": user.username,
+        "email": user.email,
         "home_address": user.home_address
     }
 

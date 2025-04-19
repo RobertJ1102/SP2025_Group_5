@@ -46,31 +46,37 @@ const HelpPage = () => {
 
       <Paper elevation={3} sx={{ padding: "16px", marginTop: "16px" }}>
         <Typography variant="h5" gutterBottom>
-          How to Use
+          How to Use FareFinder
         </Typography>
         <List>
           <ListItem>
             <ListItemText
-              primary="Step 1: Register or Login"
-              secondary="Create an account or log in using your credentials to access the application."
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemText
-              primary="Step 2: Enter Locations"
+              primary="Step 1: Enter Locations"
               secondary="Use the input fields on the homepage to specify your pickup and destination locations."
             />
           </ListItem>
           <ListItem>
             <ListItemText
-              primary="Step 3: View Ride Options"
-              secondary="FareFinder will display the best ride options based on your input."
+              primary="Step 2: Ride Estimation"
+              secondary="Click on the Estimate Route button to generate your best route."
             />
           </ListItem>
           <ListItem>
             <ListItemText
-              primary="Step 4: Manage Your Profile"
-              secondary="Access your profile to view ride history, update preferences, or change your password."
+              primary="Step 3: Order Ride"
+              secondary="If you are satisfied with your price estimation, you can press Open In Uber to easily order the ride."
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary="Step 4: Walk"
+              secondary="Once you have ordered your ride, you need to walk to the adjusted pick up location."
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary="Step 5: Complete"
+              secondary="Now just wait for your Uber to arrive, you can track it on the Uber app."
             />
           </ListItem>
         </List>
@@ -83,12 +89,6 @@ const HelpPage = () => {
         <List>
           <ListItem>
             <ListItemText
-              primary="Why can't I log in?"
-              secondary="Ensure that your username and password are correct. If you forgot your password, use the Forgot Password option."
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemText
               primary="How do I update my profile?"
               secondary="Go to the Profile page and edit your information. Don't forget to save your changes."
             />
@@ -97,6 +97,12 @@ const HelpPage = () => {
             <ListItemText
               primary="Is my data secure?"
               secondary="Yes, FareFinder uses secure protocols to protect your data."
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary="How do I change my password?"
+              secondary="Navigate to the Profile page and click Change Password. Enter your email, current password, and the new password, then click Change Password."
             />
           </ListItem>
         </List>

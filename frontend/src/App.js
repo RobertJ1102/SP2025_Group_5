@@ -69,14 +69,6 @@ function App() {
           }
         />
         <Route
-          path="/help"
-          element={
-            <PublicRoute user={user}>
-              <HelpPage />
-            </PublicRoute>
-          }
-        />
-        <Route
           path="/forgot-password"
           element={
             <PublicRoute user={user}>
@@ -105,6 +97,15 @@ function App() {
                 <Header onLogout={handleLogout} />
                 <ChangePasswordPage />
               </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute user={user}>
+              <Header onLogout={handleLogout} />
+              <HelpPage />
             </ProtectedRoute>
           }
         />

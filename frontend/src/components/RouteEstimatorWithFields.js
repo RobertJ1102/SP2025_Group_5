@@ -10,6 +10,7 @@ const RouteEstimatorWithFields = () => {
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [routeEstimation, setRouteEstimation] = useState(null);
+  const [fareOptions, setFareOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeSelection, setActiveSelection] = useState("auto");
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
@@ -102,10 +103,10 @@ const RouteEstimatorWithFields = () => {
       end_lon: destinationCoordinates.lng,
     });
     try {
-      const response = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams.toString()}`);
+      const response = await fetch(`http://127.0.0.1:8000/uber/best-uber-fare/?${queryParams}&limit=3`);
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
-      setRouteEstimation(data);
+      setFareOptions(data.options || []);
     } catch (err) {
       console.error("Route estimation error:", err);
     }
@@ -241,7 +242,7 @@ const RouteEstimatorWithFields = () => {
           address: destinationAddress,
           nickname: newAddressNickname,
           latitude: destinationCoordinates.lat,
-          longitude: destinationCoordinates.lng
+          longitude: destinationCoordinates.lng,
         }),
       });
       if (response.ok) {
@@ -399,17 +400,35 @@ const RouteEstimatorWithFields = () => {
             Loading...
           </Typography>
         )}
-        {routeEstimation && (
+        {fareOptions.length > 0 && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="body2">
-              <strong>Best Location:</strong> {routeEstimation.best_location}
+            <Typography variant="h6" gutterBottom>
+              Top {fareOptions.length} Cheapest Rides
             </Typography>
-            <Typography variant="body2">
-              <strong>Best Price:</strong> {routeEstimation.best_price}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Best Ride Type:</strong> {routeEstimation.best_ride_type}
-            </Typography>
+
+            {fareOptions.map((opt, i) => (
+              <Paper
+                key={i}
+                elevation={i === 0 ? 4 : 1}
+                sx={{
+                  p: 2,
+                  mb: 1,
+                  borderLeft: i === 0 ? "4px solid" : "none",
+                  borderColor: (theme) => theme.palette.primary.main,
+                }}
+              >
+                <Typography variant="subtitle1">
+                  {i + 1}. {opt.ride_type}
+                  {i === 0 && " – Best"}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Location:</strong> {opt.location}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Price:</strong> ${opt.price.toFixed(2)}
+                </Typography>
+              </Paper>
+            ))}
           </Box>
         )}
 

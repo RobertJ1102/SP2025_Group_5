@@ -22,13 +22,19 @@ if GMAP_API_KEY is None:
 EARTH_RADIUS = 6378137
 
 @router.get("/best-uber-fare/")
-def get_best_uber_fare(start_lat: float, start_lon: float, end_lat: float, end_lon: float):
+def get_best_uber_fare(
+    start_lat: float,
+    start_lon: float,
+    end_lat: float,
+    end_lon: float,
+    limit: int = 3,
+):
     """
-    API Endpoint to find the best Uber fare by checking multiple nearby locations.
+    Returns the top `limit` cheapest Uber fares from original+nearby pickup spots.
     """
     try:
-        best_fare = find_best_fare(start_lat, start_lon, end_lat, end_lon)
-        return best_fare
+        options = find_top_fares(start_lat, start_lon, end_lat, end_lon, limit)
+        return {"options": options}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
@@ -55,6 +61,53 @@ def get_uber_access_token():
         status_code=500,
         detail=f"Failed to get Uber access token: {response.json()}"
     )
+
+def find_top_fares(start_lat, start_lon, end_lat, end_lon, limit):
+    """
+    Finds the top `limit` cheapest Uber fares from original and nearby pickup spots.
+    Distances are specified in feet, but converted to meters under the hood.
+    """
+    directions     = ("N","E","S","W","NE","NW","SE","SW")
+    distances_ft   = (300, 500)
+    locations = [
+        (start_lat, start_lon, "Original"),
+        *[
+            # convert feet → meters (1 ft ≈ 0.3048 m), then label with the original feet
+            move_location(
+                start_lat,
+                start_lon,
+                round(ft * 0.3048),
+                dir
+            ) + (f"{dir} {ft}ft",)
+            for dir in directions
+            for ft  in distances_ft
+        ],
+    ]
+
+    all_results = []
+    with ThreadPoolExecutor(max_workers=len(locations)) as executor:
+        futures = [
+            executor.submit(process_location_uber, loc, end_lat, end_lon)
+            for loc in locations
+        ]
+        for future in as_completed(futures):
+            result = future.result()
+            if not result:
+                continue
+            label, prices = result
+            for ride in prices:
+                price = ride.get("low_estimate")
+                if price is None:
+                    continue
+                all_results.append({
+                    "location":  label,        # e.g. "N 300ft"
+                    "price":     price,
+                    "ride_type": ride.get("display_name"),
+                })
+
+    # sort by price ascending, take top `limit`
+    all_results.sort(key=lambda x: x["price"])
+    return all_results[:limit]
 
 def move_location(lat, lon, meters, direction):
     """

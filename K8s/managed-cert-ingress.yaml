@@ -6,6 +6,7 @@ metadata:
     kubernetes.io/ingress.class: "gce"
     kubernetes.io/ingress.global-static-ip-name: farefinder-ip
     networking.gke.io/managed-certificates: farefinder-cert
+    networking.gke.io/frontend-config: https-redirect
 spec:
   rules:
   - host: farefinder.syntale.net

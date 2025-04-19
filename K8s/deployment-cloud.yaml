@@ -111,7 +111,7 @@ spec:
     spec:
       containers:
       - name: farefinder-frontend
-        image: gcr.io/farefinder-451119/farefinder_frontend:1.0.0
+        image: gcr.io/farefinder-451119/farefinder_frontend:1.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

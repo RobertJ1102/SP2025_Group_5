@@ -23,6 +23,10 @@ function PublicRoute({ user, children }) {
 }
 
 function App() {
+  if (window.location.protocol === "http:" && window.location.hostname !== "localhost") {
+    window.location.href = "https://" + window.location.host + window.location.pathname + window.location.search;
+  }
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 

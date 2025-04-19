@@ -342,8 +342,12 @@ const RouteEstimatorWithFields = () => {
               setPickupAddress(e.target.value);
               fetchSuggestions(e.target.value, setPickupSuggestions);
             }}
+            onFocus={() => setActiveSelection("pickup")}
             onBlur={() => {
-              setTimeout(() => setPickupSuggestions([]), 200);
+              setTimeout(() => {
+                setPickupSuggestions([]);
+                setActiveSelection("auto");
+              }, 200);
             }}
             sx={{ mb: 2 }}
           />
@@ -376,8 +380,12 @@ const RouteEstimatorWithFields = () => {
               setDestinationAddress(e.target.value);
               fetchSuggestions(e.target.value, setDestinationSuggestions);
             }}
+            onFocus={() => setActiveSelection("destination")}
             onBlur={() => {
-              setTimeout(() => setDestinationSuggestions([]), 200);
+              setTimeout(() => {
+                setDestinationSuggestions([]);
+                setActiveSelection("auto");
+              }, 200);
             }}
             sx={{ mb: 2 }}
           />
@@ -397,22 +405,6 @@ const RouteEstimatorWithFields = () => {
               ))}
             </Paper>
           )}
-        </Box>
-
-        {/* Map Selection Buttons */}
-        <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
-          <Button
-            variant={activeSelection === "pickup" ? "contained" : "outlined"}
-            onClick={() => setActiveSelection("pickup")}
-          >
-            Set Pickup by Map
-          </Button>
-          <Button
-            variant={activeSelection === "destination" ? "contained" : "outlined"}
-            onClick={() => setActiveSelection("destination")}
-          >
-            Set Destination by Map
-          </Button>
         </Box>
 
         {/* Estimate and Route Details */}

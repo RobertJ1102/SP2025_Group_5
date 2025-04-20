@@ -149,6 +149,8 @@ const RouteEstimatorWithFields = () => {
       console.error("Both pickup and destination must be set to add to history");
       return;
     }
+    const timezoneOffset = new Date().getTimezoneOffset();
+
     const addressData = {
       written_address: pickupAddress,
       final_address: destinationAddress,
@@ -156,6 +158,7 @@ const RouteEstimatorWithFields = () => {
       latitude_start: pickupCoordinates.lat,
       longitude_end: destinationCoordinates.lng,
       latitude_end: destinationCoordinates.lat,
+      timezone_offset: timezoneOffset,
     };
     try {
       const response = await fetch("http://127.0.0.1:8000/profile/history/add", {
@@ -195,8 +198,6 @@ const RouteEstimatorWithFields = () => {
       `&pickup=${encodeURIComponent(JSON.stringify(pickupData))}` +
       `&drop[0]=${encodeURIComponent(JSON.stringify(dropData))}` +
       `&product_id=${PRODUCT_ID}`;
-
-    console.log("Opening Uber with URL:", url);
 
     window.open(url, "_blank");
     addRouteToHistory();

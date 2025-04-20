@@ -21,14 +21,14 @@ function Info() {
           credentials: "include", // Include cookies in the request
         });
 
-        console.log("Response:", response); // Debug and show entire response in console
+        //console.log("Response:", response); // Debug and show entire response in console
 
         if (!response.ok) {
           throw new Error("Failed to fetch user information");
         }
 
         const data = await response.json();
-        console.log("Data:", data); // Debug and show entire response data in console
+        //console.log("Data:", data); // Debug and show entire response data in console
         setUserInfo(data);
       } catch (err) {
         setError(err.message);
@@ -102,7 +102,7 @@ function Info() {
         ...userInfo,
         ...updatedData,
         email: userInfo.email,
-        username: userInfo.username
+        username: userInfo.username,
       });
       setIsEditing(false);
     } catch (err) {
@@ -215,10 +215,10 @@ function Info() {
             alignItems: "center",
             gap: 2,
             width: "100%",
-            maxWidth: "400px"
+            maxWidth: "400px",
           }}
         >
-          <Box sx={{ position: 'relative', width: '100%', mb: 1 }}>
+          <Box sx={{ position: "relative", width: "100%", mb: 1 }}>
             <TextField
               label="Home Address"
               name="home_address"
@@ -228,20 +228,22 @@ function Info() {
               placeholder="Enter Home Address"
               fullWidth
               onBlur={() => {
-                  setTimeout(() => setHomeAddressSuggestions([]), 200);
+                setTimeout(() => setHomeAddressSuggestions([]), 200);
               }}
             />
             {homeAddressSuggestions.length > 0 && (
-               <Paper sx={{
-                  position: 'absolute',
-                  top: '100%',
+              <Paper
+                sx={{
+                  position: "absolute",
+                  top: "100%",
                   left: 0,
                   right: 0,
                   zIndex: 1001,
                   mt: 0.5,
-                  maxHeight: '200px',
-                  overflow: 'auto'
-                }}>
+                  maxHeight: "200px",
+                  overflow: "auto",
+                }}
+              >
                 {homeAddressSuggestions.map((suggestion) => (
                   <Box
                     key={suggestion.place_id}
@@ -254,12 +256,7 @@ function Info() {
               </Paper>
             )}
           </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSave}
-            className="button"
-          >
+          <Button variant="contained" color="primary" onClick={handleSave} className="button">
             Save
           </Button>
         </Box>
@@ -291,18 +288,10 @@ function Info() {
               px: 2,
             }}
           >
-            <Button
-              variant="outlined"
-              onClick={handleEditToggle}
-              className="info-button"
-            >
+            <Button variant="outlined" onClick={handleEditToggle} className="info-button">
               Edit
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate("/change-password")}
-            >
+            <Button variant="contained" color="primary" onClick={() => navigate("/change-password")}>
               Change Password
             </Button>
           </Box>

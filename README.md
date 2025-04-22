@@ -1,25 +1,79 @@
-# SP2025: Group &lt;Group Number&gt; &lt;FareFinder&gt;
+# 🚗 Farefinder — SP2025 Group 5
 
-Name your repository using the following format:  
-**SP2025*Group*&lt;Group Number&gt;**  
-(Example: SP2025_Group_9)
+**Farefinder** helps users discover the most affordable Uber pickup points during periods of surge pricing, such as around large group events. Whether you're attending a concert, traveling from the airport, or simply trying to save a few dollars on your next ride, Farefinder finds nearby pickup alternatives that are cheaper—so you don't have to overpay.
 
-## Team Members
+---
 
-- **&lt;Robert Jacobs&gt;**: &lt;robert.jacobs@wustl.edu&gt; ; &lt;RobertJ1102&gt;
-- **&lt;Albert Tang&gt;**: &lt;albert.t@wustl.edu&gt; ; &lt;albear007&gt;
-- **&lt;Eric Liu&gt;**: &lt;e.m.liu@wustl.edu&gt; ; &lt;EricWashu&gt;
+## 👥 Team Members
 
-## TA
+- **Robert Jacobs**  
+  _Email:_ robert.jacobs@wustl.edu  
+  _GitHub:_ [RobertJ1102](https://github.com/RobertJ1102)
 
-&lt;Asher&gt;
+- **Albert Tang**  
+  _Email:_ albert.t@wustl.edu  
+  _GitHub:_ [albear007](https://github.com/albear007)
 
-## Objectives
+- **Eric Liu**  
+  _Email:_ e.m.liu@wustl.edu  
+  _GitHub:_ [EricWashu](https://github.com/EricWashu)
 
-&lt;Description of what your project is about, your key functionalities, tech stacks used, etc. &gt;
+**TA:** Asher
 
-## How to Run
+---
 
-&lt;Instructions for how to run your project. Include the URI to your project at the top if applicable.&gt;
+## 🎯 Objectives
 
-Run `docker-compose up --build` in the root directory to start the project. The frontend will be available at `http://127.0.0.1:3000` and the backend will be available at `http://127.0.0.1:8000`.
+Farefinder addresses the problem of overpriced Uber fares during high-demand periods by suggesting nearby, lower-cost pickup alternatives. While designed to help users avoid surge pricing near large events, it is equally useful for finding affordable rides at any time.
+
+> _"Why walk into surge pricing when cheaper options are just around the corner?"_
+
+The application utilizes a geospatial search algorithm to suggest nearby cheaper locations within a configurable walking distance. Though integration with the official Uber API is still in progress, a mocked API is currently used for development and testing.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React, Material UI, Google Maps API
+- **Backend:** FastAPI
+- **Geolocation Services:** Google Maps Geocoding & Places APIs
+- **Deployment:** Docker + Google Cloud
+- **Mocked API:** Simulates Uber price estimates based on distance and time factors
+
+---
+
+## 🚀 How to Run
+
+### 🌐 Live Version
+
+The production version is deployed and available at:
+
+🔗 [https://farefinder.syntale.net](https://farefinder.syntale.net)
+
+---
+
+### 🧪 Local Development (Docker)
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/RobertJ1102/SP2025_Group_5.git
+   cd SP2025_Group_5
+   ```
+
+2. **Start the app with Docker Compose**
+
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Visit in your browser**
+   ```
+   http://localhost:3000
+   ```
+
+---
+
+## 📬 Contact
+
+Feel free to reach out to any of the team members above for questions, contributions, or ideas.

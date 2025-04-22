@@ -1,10 +1,10 @@
-# 🚗 Farefinder — SP2025 Group 5
+# Farefinder — SP2025 Group 5
 
 **Farefinder** helps users discover the most affordable Uber pickup points during periods of surge pricing, such as around large group events. Whether you're attending a concert, traveling from the airport, or simply trying to save a few dollars on your next ride, Farefinder finds nearby pickup alternatives that are cheaper—so you don't have to overpay.
 
 ---
 
-## 👥 Team Members
+## Team Members
 
 - **Robert Jacobs**  
   _Email:_ robert.jacobs@wustl.edu  
@@ -22,7 +22,7 @@
 
 ---
 
-## 🎯 Objectives
+## Objectives
 
 Farefinder addresses the problem of overpriced Uber fares during high-demand periods by suggesting nearby, lower-cost pickup alternatives. While designed to help users avoid surge pricing near large events, it is equally useful for finding affordable rides at any time.
 
@@ -32,19 +32,20 @@ The application utilizes a geospatial search algorithm to suggest nearby cheaper
 
 ---
 
-## 🛠️ Tech Stack
+## Our Tech Stack
 
 - **Frontend:** React, Material UI, Google Maps API
 - **Backend:** FastAPI
+- **Database** MySql
 - **Geolocation Services:** Google Maps Geocoding & Places APIs
-- **Deployment:** Docker + Google Cloud
+- **Deployment:** Docker + Google Cloud + Kubernetes
 - **Mocked API:** Simulates Uber price estimates based on distance and time factors
 
 ---
 
-## 🚀 How to Run
+## How to Run
 
-### 🌐 Live Version
+### Live Version
 
 The production version is deployed and available at:
 
@@ -52,7 +53,7 @@ The production version is deployed and available at:
 
 ---
 
-### 🧪 Local Development (Docker)
+### Local Development (Docker)
 
 1. **Clone the repository**
 
@@ -74,6 +75,6 @@ The production version is deployed and available at:
 
 ---
 
-## 📬 Contact
+## Contact
 
 Feel free to reach out to any of the team members above for questions, contributions, or ideas.

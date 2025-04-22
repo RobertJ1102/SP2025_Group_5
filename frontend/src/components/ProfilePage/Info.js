@@ -21,14 +21,14 @@ function Info() {
           credentials: "include", // Include cookies in the request
         });
 
-        console.log("Response:", response); // Debug and show entire response in console
+        //console.log("Response:", response); // Debug and show entire response in console
 
         if (!response.ok) {
           throw new Error("Failed to fetch user information");
         }
 
         const data = await response.json();
-        console.log("Data:", data); // Debug and show entire response data in console
+        //console.log("Data:", data); // Debug and show entire response data in console
         setUserInfo(data);
       } catch (err) {
         setError(err.message);
@@ -98,7 +98,12 @@ function Info() {
       }
 
       const updatedData = await response.json();
-      setUserInfo(updatedData);
+      setUserInfo({
+        ...userInfo,
+        ...updatedData,
+        email: userInfo.email,
+        username: userInfo.username,
+      });
       setIsEditing(false);
     } catch (err) {
       setError(err.message);
@@ -162,25 +167,42 @@ function Info() {
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
             gap: 1,
-            justifyContent: "center",
           }}
         >
-          <Typography
-            variant="h5"
+          <Box
             sx={{
-              color: userInfo.first_name ? "text.primary" : "text.secondary",
+              display: "flex",
+              gap: 1,
+              justifyContent: "center",
             }}
           >
-            {userInfo.first_name || "First Name"}
-          </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                color: userInfo.first_name ? "text.primary" : "text.secondary",
+              }}
+            >
+              {userInfo.first_name || userInfo.username}
+            </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                color: userInfo.last_name ? "text.primary" : "text.secondary",
+              }}
+            >
+              {userInfo.last_name}
+            </Typography>
+          </Box>
           <Typography
-            variant="h5"
+            variant="body1"
             sx={{
-              color: userInfo.last_name ? "text.primary" : "text.secondary",
+              color: "text.secondary",
             }}
           >
-            {userInfo.last_name || "Last Name"}
+            {userInfo.email}
           </Typography>
         </Box>
       )}
@@ -256,7 +278,7 @@ function Info() {
               color: userInfo.home_address ? "text.primary" : "text.secondary",
             }}
           >
-            {userInfo.home_address || "Home Address"}
+            {userInfo.home_address}
           </Typography>
           <Box
             sx={{

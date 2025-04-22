@@ -1,6 +1,6 @@
 # backend/app/profile.py
 """Profile management routes."""
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from sqlalchemy.orm import Session
 from itsdangerous import URLSafeTimedSerializer
@@ -35,6 +35,8 @@ def get_user_info(request: Request, db: Session = Depends(get_db)):
     return {
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "username": user.username,
+        "email": user.email,
         "home_address": user.home_address
     }
 
@@ -185,6 +187,13 @@ def add_user_history(
     user = db.query(User).filter(User.username == username).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+        
+    # Get the timezone offset from the request
+    timezone_offset = address_data.get("timezone_offset", 0)  # Default to 0 if not provided
+
+    # Calculate the user's local time
+    utc_now = datetime.now(timezone.utc)
+    local_time = utc_now - timedelta(minutes=timezone_offset)
 
     # Create a new address entry
     new_address = Address(
@@ -195,7 +204,7 @@ def add_user_history(
         latitude_start=address_data.get("latitude_start"),
         longitude_end=address_data.get("longitude_end"),
         latitude_end=address_data.get("latitude_end"),
-        timestamp=datetime.now()
+        timestamp=local_time
     )
 
     # Add the new address to the session and commit

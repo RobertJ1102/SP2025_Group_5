@@ -1,11 +1,12 @@
 """ Authentication routes for the FastAPI application """
 import random
 import string
+import re
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
 from fastapi_mail import FastMail, MessageSchema, MessageType
 from passlib.context import CryptContext
 from itsdangerous import URLSafeTimedSerializer, BadData, SignatureExpired
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from sqlalchemy.orm import Session
 from .config import conf
 from .config import SECRET_KEY
@@ -18,6 +19,18 @@ router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 serializer = URLSafeTimedSerializer(SECRET_KEY)
 
+def validate_password_strength(password: str) -> bool:
+    """Validate password strength requirements"""
+    if len(password) < 8 or len(password) > 20:
+        return False
+    if not re.search(r'[A-Z]', password):  # Check for uppercase
+        return False
+    if not re.search(r'[a-z]', password):  # Check for lowercase
+        return False
+    if not re.search(r'[0-9]', password):  # Check for numbers
+        return False
+    return True
+
 # Hash password
 def hash_password(password: str):
     """ Hash the password """
@@ -26,7 +39,14 @@ def hash_password(password: str):
 @router.post("/register")
 def register(user: UserCreate, response: Response, db: Session = Depends(get_db)):
     """Registers a new user."""
-    # Check if user exists by email
+    # Validate password strength
+    if not validate_password_strength(user.password):
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be 8-20 characters long and contain uppercase, lowercase, and numbers"
+        )
+
+    # Check if user exists
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -178,6 +198,14 @@ async def change_password(
     db: Session = Depends(get_db)
 ):
     """Change user password"""
+    # Validate new password strength
+    if not validate_password_strength(request.new_password):
+        raise HTTPException(
+            status_code=400,
+            detail="New password must be 8-20 characters long and contain uppercase, lowercase, and numbers"
+        )
+
+    # confirm user exists in db, then change password to a new password
     user = db.query(User).filter(User.email == request.email).first()
     if not user:
         raise HTTPException(status_code=404, detail="Email not found")

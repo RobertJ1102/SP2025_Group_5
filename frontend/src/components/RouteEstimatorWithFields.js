@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, TextField, Button, Typography, Paper, MenuItem, Select, IconButton } from "@mui/material";
+import { Box, TextField, Button, Typography, Paper, Alert, Select, IconButton } from "@mui/material";
 import GoogleMap from "./GoogleMap";
 import useUserLocation from "../hooks/useUserLocation";
 
@@ -9,7 +9,7 @@ const RouteEstimatorWithFields = () => {
   const [destinationAddress, setDestinationAddress] = useState("");
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
-  const [routeEstimation, setRouteEstimation] = useState(null);
+  const [fareOptions, setFareOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeSelection, setActiveSelection] = useState("auto");
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
@@ -17,6 +17,10 @@ const RouteEstimatorWithFields = () => {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [newAddressNickname, setNewAddressNickname] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("");
+  const [userPreferences, setUserPreferences] = useState(null);
+  const [errorToast, setErrorToast] = useState("");
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [optionPoints, setOptionPoints] = useState([]);
 
   // Prefill pickup coordinates and address when location is available
   useEffect(() => {
@@ -87,27 +91,63 @@ const RouteEstimatorWithFields = () => {
     }
   };
 
+  // Fetch user preferences on component mount
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const response = await fetch("/api/profile/preferences", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUserPreferences(data);
+        }
+      } catch (err) {
+        console.error("Error fetching preferences:", err);
+      }
+    };
+    fetchPreferences();
+  }, []);
+
   // Estimate route via internal API
   const estimateRoute = async () => {
+    setErrorToast("");
+
     if (!pickupCoordinates || !destinationCoordinates) {
+      setErrorToast("Pickup and destination must be set!");
       console.error("Both pickup and destination must be set");
       return;
     }
     setLoading(true);
-    setRouteEstimation(null);
+
+    // Get search range from preferences, default to 500 feet if not set
+    const searchRange = userPreferences?.search_range ? parseInt(userPreferences.search_range) : 500;
+
     const queryParams = new URLSearchParams({
       start_lat: pickupCoordinates.lat,
       start_lon: pickupCoordinates.lng,
       end_lat: destinationCoordinates.lat,
       end_lon: destinationCoordinates.lng,
+      search_range: searchRange,
+      limit: 3,
     });
+
     try {
-      const response = await fetch(`/api/uber/best-uber-fare/?${queryParams.toString()}`);
+      const url = `/api/uber/best-uber-fare/?${queryParams.toString()}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
-      setRouteEstimation(data);
+      const opts = data.options || [];
+      setFareOptions(opts);
+
+      const optionPoints = opts.map((o) => ({
+        lat: o.pickup_lat,
+        lng: o.pickup_lon,
+      }));
+      setOptionPoints(optionPoints);
     } catch (err) {
       console.error("Route estimation error:", err);
+      setErrorToast("Sorry, something went wrong fetching fares.");
     }
     setLoading(false);
   };
@@ -117,6 +157,8 @@ const RouteEstimatorWithFields = () => {
       console.error("Both pickup and destination must be set to add to history");
       return;
     }
+    const timezoneOffset = new Date().getTimezoneOffset();
+
     const addressData = {
       written_address: pickupAddress,
       final_address: destinationAddress,
@@ -124,6 +166,7 @@ const RouteEstimatorWithFields = () => {
       latitude_start: pickupCoordinates.lat,
       longitude_end: destinationCoordinates.lng,
       latitude_end: destinationCoordinates.lat,
+      timezone_offset: timezoneOffset,
     };
     try {
       const response = await fetch("/api/profile/history/add", {
@@ -139,17 +182,15 @@ const RouteEstimatorWithFields = () => {
     }
   };
 
-  const handleOpenUber = () => {
-    if (!pickupCoordinates || !destinationCoordinates) {
-      console.error("Both pickup and destination must be set to open in Uber");
-      return;
-    }
+  const handleOpenUberFor = (opt) => {
+    if (!opt) return;
     const CLIENT_ID = "bGx0iZIMpiDhwEoOIQX_CZNek5LBJoAfBej5JmEJ";
     const PRODUCT_ID = "2d1d002b-d4d0-4411-98e1-673b244878b2";
+
     const pickupData = {
-      latitude: pickupCoordinates.lat,
-      longitude: pickupCoordinates.lng,
-      addressLine1: pickupAddress,
+      latitude: opt.pickup_lat,
+      longitude: opt.pickup_lon,
+      addressLine1: opt.location,
       addressLine2: "",
     };
     const dropData = {
@@ -158,16 +199,15 @@ const RouteEstimatorWithFields = () => {
       addressLine1: destinationAddress,
       addressLine2: "",
     };
-    const uberDeepLink =
-      `https://m.uber.com/looking?client_id=${CLIENT_ID}` +
+
+    const url =
+      `https://m.uber.com/looking?` +
+      `client_id=${CLIENT_ID}` +
       `&pickup=${encodeURIComponent(JSON.stringify(pickupData))}` +
       `&drop[0]=${encodeURIComponent(JSON.stringify(dropData))}` +
       `&product_id=${PRODUCT_ID}`;
-    window.open(uberDeepLink, "_blank");
-  };
 
-  const handleOpenUberAndAddHistory = () => {
-    handleOpenUber();
+    window.open(url, "_blank");
     addRouteToHistory();
   };
 
@@ -283,9 +323,10 @@ const RouteEstimatorWithFields = () => {
         activeSelection={activeSelection}
         onSetPickup={handleSetPickup}
         onSetDestination={handleSetDestination}
-        currentLocation={pickupCoordinates || (location ? { lat: location[1], lng: location[0] } : null)}
+        currentLocation={location ? { lat: location[1], lng: location[0] } : null}
         pickupPoint={pickupCoordinates}
         destinationPoint={destinationCoordinates}
+        optionPoints={optionPoints}
       />
 
       {/* Floating Input Overlay */}
@@ -306,6 +347,12 @@ const RouteEstimatorWithFields = () => {
           Route Estimator
         </Typography>
 
+        {errorToast && (
+          <Alert severity="warning" onClose={() => setErrorToast("")} sx={{ mb: 2 }}>
+            {errorToast}
+          </Alert>
+        )}
+
         {/* Pickup Field with Suggestions */}
         <Box sx={{ mb: 3, position: "relative" }}>
           <TextField
@@ -317,8 +364,12 @@ const RouteEstimatorWithFields = () => {
               setPickupAddress(e.target.value);
               fetchSuggestions(e.target.value, setPickupSuggestions);
             }}
+            onFocus={() => setActiveSelection("pickup")}
             onBlur={() => {
-              setTimeout(() => setPickupSuggestions([]), 200);
+              setTimeout(() => {
+                setPickupSuggestions([]);
+                setActiveSelection("auto");
+              }, 200);
             }}
             sx={{ mb: 2 }}
           />
@@ -351,8 +402,12 @@ const RouteEstimatorWithFields = () => {
               setDestinationAddress(e.target.value);
               fetchSuggestions(e.target.value, setDestinationSuggestions);
             }}
+            onFocus={() => setActiveSelection("destination")}
             onBlur={() => {
-              setTimeout(() => setDestinationSuggestions([]), 200);
+              setTimeout(() => {
+                setDestinationSuggestions([]);
+                setActiveSelection("auto");
+              }, 200);
             }}
             sx={{ mb: 2 }}
           />
@@ -374,22 +429,6 @@ const RouteEstimatorWithFields = () => {
           )}
         </Box>
 
-        {/* Map Selection Buttons */}
-        <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
-          <Button
-            variant={activeSelection === "pickup" ? "contained" : "outlined"}
-            onClick={() => setActiveSelection("pickup")}
-          >
-            Set Pickup by Map
-          </Button>
-          <Button
-            variant={activeSelection === "destination" ? "contained" : "outlined"}
-            onClick={() => setActiveSelection("destination")}
-          >
-            Set Destination by Map
-          </Button>
-        </Box>
-
         {/* Estimate and Route Details */}
         <Button variant="contained" fullWidth onClick={estimateRoute}>
           Estimate Route
@@ -399,23 +438,49 @@ const RouteEstimatorWithFields = () => {
             Loading...
           </Typography>
         )}
-        {routeEstimation && (
+        {fareOptions.length > 0 && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="body2">
-              <strong>Best Location:</strong> {routeEstimation.best_location}
+            <Typography variant="h6" gutterBottom>
+              Top {fareOptions.length} Cheapest Rides
             </Typography>
-            <Typography variant="body2">
-              <strong>Best Price:</strong> {routeEstimation.best_price}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Best Ride Type:</strong> {routeEstimation.best_ride_type}
-            </Typography>
+
+            {fareOptions.map((opt, i) => (
+              <Paper
+                key={i}
+                onClick={() => setSelectedIdx(i)}
+                elevation={selectedIdx === i ? 6 : 1}
+                sx={{
+                  p: 2,
+                  mb: 1,
+                  cursor: "pointer",
+                  // thick colored border for the selected card
+                  borderLeft: selectedIdx === i ? "4px solid" : "none",
+                  borderColor: (theme) => theme.palette.primary.main,
+                }}
+              >
+                <Typography variant="subtitle1">
+                  {i + 1}. {opt.ride_type}
+                  {selectedIdx === i && " – Selected"}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Location:</strong> {opt.location}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Price:</strong> ${opt.price.toFixed(2)}
+                </Typography>
+              </Paper>
+            ))}
           </Box>
         )}
 
         {/* Open in Uber Button */}
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" fullWidth onClick={handleOpenUberAndAddHistory}>
+          <Button
+            onClick={() => handleOpenUberFor(fareOptions[selectedIdx])}
+            disabled={fareOptions.length === 0}
+            variant="contained"
+            fullWidth
+          >
             Open in Uber
           </Button>
         </Box>

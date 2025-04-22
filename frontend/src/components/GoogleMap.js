@@ -15,6 +15,7 @@ const GoogleMap = ({
   currentLocation, // { lat, lng }
   pickupPoint, // { lat, lng }
   destinationPoint, // { lat, lng }
+  optionPoints = [],
 }) => {
   // For custom marker icons (circle symbols).
   const [googleAPI, setGoogleAPI] = useState(null);
@@ -82,7 +83,8 @@ const GoogleMap = ({
       <Map
         defaultCenter={currentLocation ?? INITIAL_CAMERA.center}
         defaultZoom={currentLocation ? 15 : INITIAL_CAMERA.zoom}
-        onMapLoad={handleMapLoad}
+        //onMapLoad={handleMapLoad}
+        onLoad={handleMapLoad}
         onClick={handleMapClick}
         style={{ width: "100%", height: "100%" }}
       >
@@ -91,6 +93,11 @@ const GoogleMap = ({
 
         {/* Destination Marker (Red) */}
         {destinationPoint && <Marker position={destinationPoint} options={{ icon: getMarkerIcon("red", 10) }} />}
+
+        {/* Fare‐estimate Markers (Blue) */}
+        {optionPoints.map((pt, i) => (
+          <Marker key={`opt-${i}`} position={pt} options={{ icon: getMarkerIcon("blue", 8) }} />
+        ))}
       </Map>
     </APIProvider>
   );

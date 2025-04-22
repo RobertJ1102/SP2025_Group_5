@@ -20,6 +20,7 @@ const RouteEstimatorWithFields = () => {
   const [userPreferences, setUserPreferences] = useState(null);
   const [errorToast, setErrorToast] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [optionPoints, setOptionPoints] = useState([]);
 
   // Prefill pickup coordinates and address when location is available
   useEffect(() => {
@@ -136,7 +137,14 @@ const RouteEstimatorWithFields = () => {
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
-      setFareOptions(data.options || []);
+      const opts = data.options || [];
+      setFareOptions(opts);
+
+      const optionPoints = opts.map((o) => ({
+        lat: o.pickup_lat,
+        lng: o.pickup_lon,
+      }));
+      setOptionPoints(optionPoints);
     } catch (err) {
       console.error("Route estimation error:", err);
       setErrorToast("Sorry, something went wrong fetching fares.");
@@ -318,6 +326,7 @@ const RouteEstimatorWithFields = () => {
         currentLocation={pickupCoordinates || (location ? { lat: location[1], lng: location[0] } : null)}
         pickupPoint={pickupCoordinates}
         destinationPoint={destinationCoordinates}
+        optionPoints={optionPoints}
       />
 
       {/* Floating Input Overlay */}

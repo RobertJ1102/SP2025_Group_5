@@ -6,10 +6,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    background-image: url("../assets/bettermap.webp");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;

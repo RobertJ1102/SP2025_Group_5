@@ -1,7 +1,8 @@
 import React, { useCallback } from "react";
-import { APIProvider, Map, AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
+import { APIProvider, Map, Marker, AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 
 const MAP_API_KEY = process.env.REACT_APP_GMAP_API_KEY;
+// You must supply a valid Map ID for advanced markers to work
 const MAP_ID = process.env.REACT_APP_GMAP_MAP_ID;
 
 const INITIAL_CAMERA = {
@@ -47,26 +48,49 @@ export default function GoogleMap({
         onClick={handleMapClick}
         style={{ width: "100%", height: "100%" }}
       >
-        {/* Pickup Marker (Green) */}
+        {/* Current Location Dot */}
+        {currentLocation && window.google?.maps?.SymbolPath && (
+          <Marker
+            position={currentLocation}
+            options={{
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 2,
+              },
+              zIndex: 100,
+            }}
+          />
+        )}
+
+        {/* Pickup Marker (Green Pin) */}
         {pickupPoint && (
           <AdvancedMarker position={pickupPoint} title="Pickup">
             <Pin background="#00FF00" borderColor="#ffffff" glyph="P" />
           </AdvancedMarker>
         )}
 
-        {/* Destination Marker (Red) */}
+        {/* Destination Marker (Red Pin) */}
         {destinationPoint && (
           <AdvancedMarker position={destinationPoint} title="Destination">
             <Pin background="#FF0000" borderColor="#ffffff" glyph="D" />
           </AdvancedMarker>
         )}
 
-        {/* Fare‑estimate Markers (Blue, numbered) */}
-        {optionPoints.map((pt, i) => (
-          <AdvancedMarker key={`opt-${i}`} position={pt} title={`Option ${i + 1}`}>
-            <Pin background="#1976D2" borderColor="#ffffff" glyph={`${i + 1}`} />
-          </AdvancedMarker>
-        ))}
+        {/* Fare‑estimate Markers (Blue Pins), skip current-location duplicates */}
+        {optionPoints.map((pt, i) => {
+          const isCurrent = currentLocation && pt.lat === currentLocation.lat && pt.lng === currentLocation.lng;
+          if (isCurrent) return null;
+
+          return (
+            <AdvancedMarker key={`opt-${i}`} position={pt} title={`Option ${i + 1}`}>
+              <Pin background="#1976D2" borderColor="#ffffff" glyph={`${i + 1}`} />
+            </AdvancedMarker>
+          );
+        })}
       </Map>
     </APIProvider>
   );

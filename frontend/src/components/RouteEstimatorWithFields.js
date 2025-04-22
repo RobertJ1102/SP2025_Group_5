@@ -323,7 +323,7 @@ const RouteEstimatorWithFields = () => {
         activeSelection={activeSelection}
         onSetPickup={handleSetPickup}
         onSetDestination={handleSetDestination}
-        currentLocation={pickupCoordinates || (location ? { lat: location[1], lng: location[0] } : null)}
+        currentLocation={location ? { lat: location[1], lng: location[0] } : null}
         pickupPoint={pickupCoordinates}
         destinationPoint={destinationCoordinates}
         optionPoints={optionPoints}

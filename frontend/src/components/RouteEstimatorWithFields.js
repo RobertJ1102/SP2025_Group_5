@@ -133,8 +133,7 @@ const RouteEstimatorWithFields = () => {
     });
 
     try {
-      const url = `/api/uber/best-uber-fare/?${queryParams.toString()}`;
-      const response = await fetch(url);
+      const response = await fetch(`/api/uber/best-uber-fare/?${queryParams.toString()}`);
       if (!response.ok) throw new Error("Failed to estimate route");
       const data = await response.json();
       const opts = data.options || [];

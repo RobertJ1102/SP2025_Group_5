@@ -12,7 +12,7 @@ from .config import GMAP_API_KEY
 router = APIRouter()
 
 EARTH_RADIUS = 6378137
-LYFT_COST_URL = "/api/lyft/cost"
+LYFT_COST_URL = "http://localhost:8000/lyft/cost"
 
 # Fake Lyft products
 LYFT_PRODUCTS = [

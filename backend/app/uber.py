@@ -11,7 +11,7 @@ router = APIRouter()
 # Uber API URLs
 UBER_TOKEN_URL = "https://auth.uber.com/oauth/v2/token"
 UBER_ESTIMATE_URL = "https://api.uber.com/v1.2/estimates/price"
-MOCK_ESTIMATE_URL = "/api/estimates/price"
+MOCK_ESTIMATE_URL = "http://localhost:8000/estimates/price"
 
 USE_GOOGLE_MAPS = True  # Use Google Maps API for reverse geocoding
 
